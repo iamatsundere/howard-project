@@ -211,7 +211,32 @@ namespace BTLXLA
                 Debug.WriteLine(bmpImage.PixelWidth + " " + bmpImage.PixelHeight);
                 //From stream to WriteableBitmap
                 wb = await StorageFileToWriteableBitmap(file);
-                //wb = await ResizeWritableBitmap(wb, (uint)wb.PixelWidth / 2 + 1, (uint)wb.PixelHeight / 2 + 1);
+
+                int fixedSize = (wb.PixelHeight < wb.PixelWidth) ? wb.PixelWidth : wb.PixelHeight;
+
+                //double originalImageWidth = WB_CapturedImage.PixelWidth;
+                //double originalImageHeight = WB_CapturedImage.PixelHeight;
+
+                //// Get the size of the image when it is displayed on the phone
+                double displayedWidth = imgCapped.ActualWidth;
+                double displayedHeight = imgCapped.ActualHeight;
+
+                double fixedDisplay = (displayedHeight < displayedWidth) ? displayedWidth : displayedHeight;
+
+                double ratio = fixedSize / fixedDisplay;
+                Debug.WriteLine(ratio);
+
+                //double x = Canvas.GetLeft(rect);
+                //double y = Canvas.GetTop(rect);
+
+
+                wb = wb.Crop(0, (int)(imgCapped.ActualHeight * ratio / 3.0),
+                    (int)(imgCapped.ActualWidth * ratio), (int)(imgCapped.ActualHeight * ratio / 3.0));
+
+                imgCapped.Source = wb;
+
+                //Debug.WriteLine(wb.PixelWidth + " " + wb.PixelHeight);
+
                 {
                     // Check whether is loaded image supported for processing.
                     // Supported image dimensions are between 40 and 2600 pixels.
@@ -320,6 +345,7 @@ namespace BTLXLA
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                ocrEngine = new OcrEngine(OcrLanguage.English);
             }
             finally
             {
@@ -332,7 +358,7 @@ namespace BTLXLA
         {
             WriteableBitmap wb = null;
             ImageProperties properties = await file.Properties.GetImagePropertiesAsync();
-            wb = new WriteableBitmap((int)properties.Width / 2, (int)properties.Height / 2);
+            wb = new WriteableBitmap((int)properties.Width, (int)properties.Height);
             wb.SetSource((await file.OpenReadAsync()));
             return wb;
         }
@@ -381,7 +407,7 @@ namespace BTLXLA
             inMemoryRandomStream2.Seek(0);
             // finally the resized writablebitmap
             var bitmap = new WriteableBitmap((int)width, (int)height);
-            bitmap.SetSourceAsync(inMemoryRandomStream2);
+            await bitmap.SetSourceAsync(inMemoryRandomStream2);
             return bitmap;
         }
     }

@@ -18,7 +18,7 @@
                         HorizontalAlignment="Center"
                         Stretch="UniformToFill" />
         <Image Name="imgCapped"
-               Stretch="UniformToFill" />
+               Stretch="Uniform" />
 
         <Grid Height="84"
               Background="{StaticResource PhoneAccentBrush}"
