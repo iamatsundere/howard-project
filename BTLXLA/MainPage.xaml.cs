@@ -131,7 +131,7 @@ namespace BTLXLA
 
 
 
-        WriteableBitmap wb;
+        public static WriteableBitmap wb;
         StorageFile file;
         BitmapImage bmpImage;
 
@@ -205,8 +205,9 @@ namespace BTLXLA
             {
                 // Prevent another OCR request, since only image can be processed at the time at same OCR engine instance.
                 grdScan.IsTapEnabled = false;
+                btnCapture.IsEnabled = false;
 
-                txtString.Text = "HELLO WORLD";
+                //txtString.Text = "HELLO WORLD";
 
                 Debug.WriteLine(bmpImage.PixelWidth + " " + bmpImage.PixelHeight);
                 //From stream to WriteableBitmap
@@ -331,12 +332,13 @@ namespace BTLXLA
                             extractedText += Environment.NewLine;
                         }
                         Debug.WriteLine(7);
-                        txtString.Text = extractedText;
+                        //txtString.Text = extractedText;
+                        Frame.Navigate(typeof(CallPage), extractedText);
 
                     }
                     else
                     {
-                        txtString.Text = "No text.";
+                        //txtString.Text = "No text.";
 
                     }
 
@@ -345,11 +347,12 @@ namespace BTLXLA
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                ocrEngine = new OcrEngine(OcrLanguage.English);
             }
             finally
             {
                 grdScan.IsTapEnabled = true;
+                btnCapture.IsEnabled = true;
+                ocrEngine = new OcrEngine(OcrLanguage.English);
             }
         }
 

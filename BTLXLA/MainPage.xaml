@@ -19,16 +19,6 @@
                         Stretch="UniformToFill" />
         <Image Name="imgCapped"
                Stretch="Uniform" />
-
-        <Grid Height="84"
-              Background="{StaticResource PhoneAccentBrush}"
-              VerticalAlignment="Top">
-            <TextBlock Name="txtString"
-                       Text="test"
-                       FontSize="{StaticResource TextStyleExtraLargeFontSize}"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center" />
-        </Grid>
         <!--<Image Grid.Row="1"
                Stretch="UniformToFill"
                Source="/Assets/6cba12ce-c402-45b5-888b-63de745ff321.jpg"/>-->
