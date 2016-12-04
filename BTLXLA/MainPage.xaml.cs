@@ -27,8 +27,6 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using WindowsPreview.Media.Ocr;
 
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
-
 namespace BTLXLA
 {
     /// <summary>
@@ -60,13 +58,6 @@ namespace BTLXLA
         {
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
             this.InitCam(Windows.Devices.Enumeration.Panel.Back);
-            // TODO: Prepare page for display here.
-
-            // TODO: If your application contains multiple pages, ensure that you are
-            // handling the hardware Back button by registering for the
-            // Windows.Phone.UI.Input.HardwareButtons.BackPressed event.
-            // If you are using the NavigationHelper provided by some templates,
-            // this event is handled for you.
         }
 
 
@@ -103,12 +94,6 @@ namespace BTLXLA
                         captureManager.SetPreviewRotation(VideoRotation.None);
                         break;
                 }
-                //if (CamId == 1) 
-                //    //capture.FlowDirection = FlowDirection.RightToLeft;
-                //    captureManager.SetPreviewRotation(VideoRotation.None);
-                //else
-                //    //capture.FlowDirection = FlowDirection.LeftToRight;
-                //    captureManager.SetPreviewRotation(VideoRotation.Clockwise270Degrees);
                 await captureManager.StartPreviewAsync();
             }
             catch (Exception ex)
@@ -206,8 +191,7 @@ namespace BTLXLA
                 // Prevent another OCR request, since only image can be processed at the time at same OCR engine instance.
                 grdScan.IsTapEnabled = false;
                 btnCapture.IsEnabled = false;
-
-                //txtString.Text = "HELLO WORLD";
+                string extractedText = "";
 
                 Debug.WriteLine(bmpImage.PixelWidth + " " + bmpImage.PixelHeight);
                 //From stream to WriteableBitmap
@@ -215,8 +199,6 @@ namespace BTLXLA
 
                 int fixedSize = (wb.PixelHeight < wb.PixelWidth) ? wb.PixelWidth : wb.PixelHeight;
 
-                //double originalImageWidth = WB_CapturedImage.PixelWidth;
-                //double originalImageHeight = WB_CapturedImage.PixelHeight;
 
                 //// Get the size of the image when it is displayed on the phone
                 double displayedWidth = imgCapped.ActualWidth;
@@ -227,16 +209,8 @@ namespace BTLXLA
                 double ratio = fixedSize / fixedDisplay;
                 Debug.WriteLine(ratio);
 
-                //double x = Canvas.GetLeft(rect);
-                //double y = Canvas.GetTop(rect);
-
-
                 wb = wb.Crop(0, (int)(imgCapped.ActualHeight * ratio / 3.0),
                     (int)(imgCapped.ActualWidth * ratio), (int)(imgCapped.ActualHeight * ratio / 3.0));
-
-                imgCapped.Source = wb;
-
-                //Debug.WriteLine(wb.PixelWidth + " " + wb.PixelHeight);
 
                 {
                     // Check whether is loaded image supported for processing.
@@ -286,8 +260,6 @@ namespace BTLXLA
                             };
                         }
 
-                        Debug.WriteLine(1);
-                        string extractedText = "";
                         Debug.WriteLine(2);
                         // Iterate over recognized lines of text.
                         foreach (var line in ocrResult.Lines)
@@ -328,19 +300,16 @@ namespace BTLXLA
                                 //TextOverlay.Children.Add(border);
                                 extractedText += word.Text + " ";
                             }
-                            Debug.WriteLine(6);
-                            extractedText += Environment.NewLine;
                         }
                         Debug.WriteLine(7);
                         //txtString.Text = extractedText;
-                        Frame.Navigate(typeof(CallPage), extractedText);
 
                     }
                     else
                     {
-                        //txtString.Text = "No text.";
-
+                        extractedText = "";
                     }
+                    Frame.Navigate(typeof(CallPage), extractedText);
 
                 }
             }
@@ -350,6 +319,7 @@ namespace BTLXLA
             }
             finally
             {
+                imgCapped.Source = null;
                 grdScan.IsTapEnabled = true;
                 btnCapture.IsEnabled = true;
                 ocrEngine = new OcrEngine(OcrLanguage.English);
@@ -365,14 +335,7 @@ namespace BTLXLA
             wb.SetSource((await file.OpenReadAsync()));
             return wb;
         }
-        //public async Task<WriteableBitmap> StorageFileToWriteableBitmap(StorageFile file, BitmapImage bmp)
-        //{
-        //    WriteableBitmap wb = null;
-        //    ImageProperties properties = await file.Properties.GetImagePropertiesAsync();
-        //    wb = new WriteableBitmap((int)bmp.PixelWidth / 2, (int)bmp.PixelHeight / 2);
-        //    wb.SetSource((await file.OpenReadAsync()));
-        //    return wb;
-        //}
+
         private async Task<WriteableBitmap> ResizeWritableBitmap(WriteableBitmap baseWriteBitmap, uint width, uint height)
         {
             // Get the pixel buffer of the writable bitmap in bytes
@@ -413,6 +376,39 @@ namespace BTLXLA
             await bitmap.SetSourceAsync(inMemoryRandomStream2);
             return bitmap;
         }
+
+
+        #region CAMERA 
+        private int flashMode = 0;
+        private string[] flashModesPath = new string[]
+        {
+            "M7,2V13H10V22L17,10H13L17,2H7Z",
+            "M17,10H13L17,2H7V4.18L15.46,12.64M3.27,3L2,4.27L7,9.27V13H10V22L13.58,15.86L17.73,20L19,18.73L3.27,3Z"
+            //"M16.85,7.65L18,4L19.15,7.65M19,2H17L13.8,11H15.7L16.4,9H19.6L20.3,11H22.2M3,2V14H6V23L13,11H9L13,2H3Z",
+        };
+        private void FlashChanged_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            flashMode += 1;
+            if (flashMode == 2)
+                flashMode = 0;
+            pathFlash.Data = Converter.FromStringToGeometry(flashModesPath[flashMode]);
+
+            // then to turn on/off camera
+            var torch = captureManager.VideoDeviceController.TorchControl;
+            Debug.WriteLine(torch.PowerPercent);
+            if (torch.Supported)
+            {
+                if (flashMode == 1)
+                {
+                    torch.Enabled = false;
+                }
+                else if (flashMode == 0)
+                {
+                    torch.Enabled = true;
+                }
+            }
+        }
+        #endregion
     }
 
 

@@ -37,8 +37,27 @@ namespace BTLXLA
             string passed = e.Parameter as string;
             if (passed.Equals(""))
                 txtString.Text = "(╯°□°）╯︵ ┻━┻";
+            else
+                txtString.Text = passed;
 
             imgCapped.Source = MainPage.wb;
+        }
+
+        private void grdBack_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            MainPage.wb = null;
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            if (rootFrame != null && rootFrame.CanGoBack)
+            {
+                e.Handled = true;
+                rootFrame.GoBack();
+            }
+        }
+
+        private void grdCall_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            Windows.ApplicationModel.Calls.PhoneCallManager.ShowPhoneCallUI("VINAPHONE", "*101#");
         }
     }
 }

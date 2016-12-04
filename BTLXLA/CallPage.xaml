@@ -27,21 +27,24 @@
                        HorizontalAlignment="Center" />
         </Grid>
         <Grid VerticalAlignment="Bottom"
-              Name="grdCall"
               Height="84">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.5*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0"
-                  Background="#b71c1c">
+                  Name="grdBack"
+                  Tapped="grdBack_Tapped"
+                  Background="#f44336">
                 <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
                       Stretch="Uniform"
                       Fill="#FFFFFF"
                       Margin="28" />
             </Grid>
             <Grid Grid.Column="1"
-                  Background="#64DD17">
+                  Name="grdCall"
+                  Tapped="grdCall_Tapped"
+                  Background="#00E676">
                 <StackPanel Orientation="Horizontal"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center">

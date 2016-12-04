@@ -18,7 +18,7 @@
                         HorizontalAlignment="Center"
                         Stretch="UniformToFill" />
         <Image Name="imgCapped"
-               Stretch="Uniform" />
+               Stretch="UniformToFill" />
         <!--<Image Grid.Row="1"
                Stretch="UniformToFill"
                Source="/Assets/6cba12ce-c402-45b5-888b-63de745ff321.jpg"/>-->
@@ -34,37 +34,49 @@
                   Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0"
                       Name="grdReCap"
                       Tapped="grdReCap_Tapped"
+                      Margin="0,48"
                       Background="Transparent">
                     <Path Data="M12,17C10.37,17 8.94,16.21 8,15H12A3,3 0 0,0 15,12C15,11.65 14.93,11.31 14.82,11H16.9C16.96,11.32 17,11.66 17,12A5,5 0 0,1 12,17M12,7C13.63,7 15.06,7.79 16,9H12A3,3 0 0,0 9,12C9,12.35 9.07,12.68 9.18,13H7.1C7.03,12.68 7,12.34 7,12A5,5 0 0,1 12,7M20,4H16.83L15,2H9L7.17,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z"
                           Fill="White"
-                          Margin="48"
                           Stretch="Uniform" />
                 </Grid>
-                <Grid Grid.Column="2"
+                <Grid Grid.Column="3"
+                      Margin="0,48"
+                      Tapped="FlashChanged_Tapped"
+                      Background="Transparent">
+                    <Path Data="M7,2V13H10V22L17,10H13L17,2H7Z"
+                          Fill="White"
+                          Name="pathFlash"
+                          Stretch="Uniform" />
+                </Grid>
+                <Grid Grid.Column="1"
                       Name="grdScan"
                       Tapped="grdScan_Tapped"
-                      Background="Transparent">
+                      Background="Transparent"
+                      Margin="0,48">
                     <Path Data="M15,130c8.284,0,15-6.716,15-15V30h85c8.284,0,15-6.716,15-15s-6.716-15-15-15H15C6.716,0,0,6.716,0,15   v100C0,123.284,6.716,130,15,130z
                               M15,330h100c8.284,0,15-6.716,15-15s-6.716-15-15-15H30v-85c0-8.284-6.716-15-15-15s-15,6.716-15,15v100   C0,323.284,6.716,330,15,330z
                               M315,200c-8.284,0-15,6.716-15,15v85h-85c-8.284,0-15,6.716-15,15s6.716,15,15,15h100   c8.284,0,15-6.716,15-15V215C330,206.716,323.284,200,315,200z
                               M215,30h85v85c0,8.284,6.716,15,15,15s15-6.716,15-15V15c0-8.284-6.716-15-15-15H215   c-8.284,0-15,6.716-15,15S206.716,30,215,30z
                               M75,165c0,8.284,6.716,15,15,15h60v60c0,8.284,6.716,15,15,15s15-6.716,15-15v-60h60   c8.284,0,15-6.716,15-15s-6.716-15-15-15h-60V90c0-8.284-6.716-15-15-15s-15,6.716-15,15v60H90C81.716,150,75,156.716,75,165z"
                           Fill="White"
-                          Margin="48"
                           Stretch="Uniform" />
                 </Grid>
-                <c4f:RoundButton ButtonHeight="100"
+                <c4f:RoundButton ButtonHeight="96"
+                                 ButtonWidth="96"
+                                 Margin="8"
                                  Name="btnCapture"
                                  Tapped="btnCapture_Tapped"
-                                 ButtonWidth="100"
                                  VerticalAlignment="Center"
-                                 Grid.Column="1"
+                                 Grid.Column="2"
                                  BorderBrush="White"
                                  BorderThickness="4"
                                  Background="Gray">
@@ -72,6 +84,5 @@
                 </c4f:RoundButton>
             </Grid>
         </Grid>
-
     </Grid>
 </Page>

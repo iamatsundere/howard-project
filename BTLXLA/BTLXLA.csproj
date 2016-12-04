@@ -87,6 +87,7 @@
     <Compile Include="CallPage.xaml.cs">
       <DependentUpon>CallPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converter.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
