@@ -122,6 +122,8 @@ namespace BTLXLA
 
         private async void btnCapture_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            await captureManager.VideoDeviceController.FocusControl.FocusAsync();
+
             //Create JPEG image Encoding format for storing image in JPEG type  
             ImageEncodingProperties imgFormat = ImageEncodingProperties.CreateJpeg();
 
@@ -209,8 +211,14 @@ namespace BTLXLA
                 double ratio = fixedSize / fixedDisplay;
                 Debug.WriteLine(ratio);
 
-                wb = wb.Crop(0, (int)(imgCapped.ActualHeight * ratio / 3.0),
-                    (int)(imgCapped.ActualWidth * ratio), (int)(imgCapped.ActualHeight * ratio / 3.0));
+                double top = Canvas.GetTop(ImageLayout);
+                double left = Canvas.GetLeft(ImageLayout);
+
+                Debug.WriteLine((int)left + " " + (int)top + " " +
+                    (int)(rect.Width * ratio) + " " + (int)(rect.Height * ratio));
+
+                wb = wb.Crop((int)left, (int)top,
+                    (int)(rect.Width * ratio), (int)(rect.Height * ratio));
 
                 {
                     // Check whether is loaded image supported for processing.
