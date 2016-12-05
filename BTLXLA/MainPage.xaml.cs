@@ -211,14 +211,14 @@ namespace BTLXLA
                 double ratio = fixedSize / fixedDisplay;
                 Debug.WriteLine(ratio);
 
-                double top = Canvas.GetTop(ImageLayout);
-                double left = Canvas.GetLeft(ImageLayout);
+                double top = grdTop.ActualHeight;
+                double left = grdBorder.ActualWidth - grdTop.ActualWidth;
 
                 Debug.WriteLine((int)left + " " + (int)top + " " +
-                    (int)(rect.Width * ratio) + " " + (int)(rect.Height * ratio));
+                    (int)(rect.ActualWidth * ratio) + " " + (int)(rect.ActualHeight * ratio));
 
-                wb = wb.Crop((int)left, (int)top,
-                    (int)(rect.Width * ratio), (int)(rect.Height * ratio));
+                wb = wb.Crop((int)(left * ratio), (int)(top * ratio),
+                    (int)(rect.ActualWidth * ratio), (int)(rect.ActualHeight * ratio));
 
                 {
                     // Check whether is loaded image supported for processing.
