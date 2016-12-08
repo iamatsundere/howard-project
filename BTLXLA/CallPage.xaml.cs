@@ -22,6 +22,7 @@ namespace BTLXLA
     /// </summary>
     public sealed partial class CallPage : Page
     {
+        string preString = "";
         public CallPage()
         {
             this.InitializeComponent();
@@ -38,7 +39,10 @@ namespace BTLXLA
             if (passed.Equals(""))
                 txtString.Text = "(╯°□°）╯︵ ┻━┻";
             else
+            {
                 txtString.Text = passed;
+                preString = passed;
+            }
 
             imgCapped.Source = MainPage.wb;
         }
@@ -57,7 +61,13 @@ namespace BTLXLA
 
         private void grdCall_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            Windows.ApplicationModel.Calls.PhoneCallManager.ShowPhoneCallUI("VINAPHONE", "*101#");
+            string proString = "";
+            for (int i = 0; i < preString.Length; i++)
+                if (preString[i] >= '0' && preString[i] <= '9')
+                {
+                    proString += preString[i];
+                }
+            Windows.ApplicationModel.Calls.PhoneCallManager.ShowPhoneCallUI("Service Provider", "*100*" + proString + "#");
         }
     }
 }
