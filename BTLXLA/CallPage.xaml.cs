@@ -37,7 +37,7 @@ namespace BTLXLA
         {
             string passed = e.Parameter as string;
             if (passed.Equals(""))
-                txtString.Text = "(╯°□°）╯︵ ┻━┻";
+                txtString.Text = "ERROR";
             else
             {
                 txtString.Text = passed;
