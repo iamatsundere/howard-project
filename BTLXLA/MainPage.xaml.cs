@@ -409,6 +409,7 @@ namespace BTLXLA
                 if (flashMode == 1)
                 {
                     torch.Enabled = false;
+                    //captureManager.MediaCaptureSettings.
                 }
                 else if (flashMode == 0)
                 {
