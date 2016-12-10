@@ -94,6 +94,21 @@ namespace BTLXLA
                         captureManager.SetPreviewRotation(VideoRotation.None);
                         break;
                 }
+
+                var torch = captureManager.VideoDeviceController.TorchControl;
+                if (torch.Supported)
+                {
+                    if (flashMode == 1)
+                    {
+                        captureManager.VideoDeviceController.FlashControl.Enabled = false;
+                        //captureManager.MediaCaptureSettings.
+                    }
+                    else if (flashMode == 0)
+                    {
+                        captureManager.VideoDeviceController.FlashControl.Enabled = true;
+                    }
+                }
+
                 await captureManager.StartPreviewAsync();
             }
             catch (Exception ex)
@@ -408,11 +423,12 @@ namespace BTLXLA
             {
                 if (flashMode == 1)
                 {
-                    torch.Enabled = false;
+                    captureManager.VideoDeviceController.FlashControl.Enabled = false;
+                    //captureManager.MediaCaptureSettings.
                 }
                 else if (flashMode == 0)
                 {
-                    torch.Enabled = true;
+                    captureManager.VideoDeviceController.FlashControl.Enabled = true;
                 }
             }
         }
