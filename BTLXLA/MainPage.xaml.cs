@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Core;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -14,6 +16,7 @@ using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
+using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Popups;
@@ -35,6 +38,7 @@ namespace BTLXLA
     public sealed partial class MainPage : Page
     {
         MediaCapture captureManager;
+        private CoreApplicationView view;
         /// <summary>
         /// 0=front 1=back
         /// </summary>
@@ -45,6 +49,11 @@ namespace BTLXLA
         public MainPage()
         {
             this.InitializeComponent();
+
+            CompositionTarget.Rendering += CompositionTarget_Rendering;
+
+            view = CoreApplication.GetCurrentView();
+
             ocrEngine = new OcrEngine(OcrLanguage.English);
             this.NavigationCacheMode = NavigationCacheMode.Required;
         }
@@ -58,6 +67,11 @@ namespace BTLXLA
         {
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
             this.InitCam(Windows.Devices.Enumeration.Panel.Back);
+
+            double top = (LayoutRoot.ActualHeight - rect.ActualHeight) / 2.0;
+            Canvas.SetTop(rect, top);
+            double left = (LayoutRoot.ActualWidth - rect.ActualWidth) / 2.0;
+            Canvas.SetLeft(rect, left);
         }
 
 
@@ -210,7 +224,7 @@ namespace BTLXLA
                 btnCapture.IsEnabled = false;
                 string extractedText = "";
 
-                Debug.WriteLine(bmpImage.PixelWidth + " " + bmpImage.PixelHeight);
+                //Debug.WriteLine(bmpImage.PixelWidth + " " + bmpImage.PixelHeight);
                 //From stream to WriteableBitmap
                 wb = await StorageFileToWriteableBitmap(file);
 
@@ -226,8 +240,8 @@ namespace BTLXLA
                 double ratio = fixedSize / fixedDisplay;
                 Debug.WriteLine(ratio);
 
-                double top = grdTop.ActualHeight;
-                double left = grdBorder.ActualWidth - grdTop.ActualWidth;
+                double top = Canvas.GetTop(rect);
+                double left = Canvas.GetLeft(rect);
 
                 Debug.WriteLine((int)left + " " + (int)top + " " +
                     (int)(rect.ActualWidth * ratio) + " " + (int)(rect.ActualHeight * ratio));
@@ -350,6 +364,39 @@ namespace BTLXLA
         }
 
 
+
+        private void grdLibrary_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            FileOpenPicker fileOpenPicker = new FileOpenPicker();
+            fileOpenPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            fileOpenPicker.ViewMode = PickerViewMode.Thumbnail;
+
+            fileOpenPicker.FileTypeFilter.Clear();
+            fileOpenPicker.FileTypeFilter.Add(".jpg");
+            fileOpenPicker.FileTypeFilter.Add(".jpeg");
+            fileOpenPicker.FileTypeFilter.Add(".png");
+
+            fileOpenPicker.PickSingleFileAndContinue();
+            view.Activated += View_Activated;
+        }
+
+        private async void View_Activated(CoreApplicationView sender, IActivatedEventArgs args1)
+        {
+            FileOpenPickerContinuationEventArgs args = args1 as FileOpenPickerContinuationEventArgs;
+
+            if (args != null)
+            {
+                if (args.Files.Count == 0) return;
+
+                view.Activated -= View_Activated;
+                file = args.Files[0];
+
+                ImageProperties properties = await file.Properties.GetImagePropertiesAsync();
+                wb = await Converter.StorageFileToWriteableBitmap(file);
+                imgCapped.Source = wb;
+            }
+        }
+
         public async Task<WriteableBitmap> StorageFileToWriteableBitmap(StorageFile file)
         {
             WriteableBitmap wb = null;
@@ -431,6 +478,56 @@ namespace BTLXLA
                     captureManager.VideoDeviceController.FlashControl.Enabled = true;
                 }
             }
+        }
+        #endregion
+
+
+        #region CROPPING
+        Point Point1, Point2, TempPoint1, TempPoint2;
+
+
+        private void img_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+            SetPoint(out TempPoint2, imgCapped, e);
+            //Debug.WriteLine("img_PointerMoved " + TempPoint2.X + " " + TempPoint2.Y);
+        }
+
+        private void img_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            Point1 = new Point(Canvas.GetLeft(rect), Canvas.GetTop(rect));
+            SetPoint(out TempPoint1, imgCapped, e);
+            TempPoint2 = TempPoint1;
+            //Debug.WriteLine("img_PointerPressed " + TempPoint1.X + " " + TempPoint1.Y);
+        }
+
+        private void img_PointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+        }
+
+        private void rect_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
+        {
+        }
+
+        private void SetPoint(out Point point, UIElement uielement, PointerRoutedEventArgs e)
+        {
+            point = e.GetCurrentPoint(uielement).Position;
+            if (point.X < 0)
+                point.X = 0;
+            if (point.Y < 0)
+                point.Y = 0;
+        }
+
+
+        private void CompositionTarget_Rendering(object sender, object e)
+        {
+            double xoffset = TempPoint2.X - TempPoint1.X;
+            double yoffset = TempPoint2.Y - TempPoint1.Y;
+
+            Point tempPoint = new Point(Point1.X + xoffset, Point1.Y + yoffset);
+            //Debug.WriteLine(tempPoint.X + " " + tempPoint.Y);
+
+            Canvas.SetLeft(rect, tempPoint.X);
+            Canvas.SetTop(rect, tempPoint.Y);
         }
         #endregion
     }

@@ -18,8 +18,34 @@
                         HorizontalAlignment="Center"
                         Stretch="UniformToFill" />
         <Image Name="imgCapped"
+               Height="{Binding ElementName=LayoutRoot,Path=ActualHeight}"
+               Width="{Binding ElementName=LayoutRoot,Path=ActualWidth}"
+               VerticalAlignment="Center"
                Stretch="UniformToFill" />
-        <Grid Name="grdBorder">
+        <Grid>
+
+            <Canvas Name="ImageLayout"
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    Height="{Binding ElementName=LayoutRoot,Path=ActualHeight}"
+                    Width="{Binding ElementName=LayoutRoot,Path=ActualWidth}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+
+                <!--Rectangle to be used for Crop Original Image-->
+                <Rectangle x:Name="rect"
+                           Height="100"
+                           Width="384"
+                           ManipulationDelta="rect_ManipulationDelta"
+                           ManipulationMode="Scale"
+                           Fill="Transparent"
+                           PointerMoved="img_PointerMoved"
+                           PointerPressed="img_PointerPressed"
+                           PointerReleased="img_PointerReleased"
+                           StrokeThickness="4"
+                           Stroke="Orange"></Rectangle>
+            </Canvas>
+            <!--<Grid Name="grdBorder">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -38,21 +64,22 @@
                        Opacity=".8"
                        VerticalAlignment="Bottom"
                        Source="/Assets/tumblr_static_bf68b8gfk0ocgokw4w8o0go04.jpg" />
-            </Grid>
+            </Grid>-->
             <!--<Canvas Name="ImageLayout"
                     Grid.Row="1"
                     Height="84"
                     Width="{Binding ElementName=LayoutRoot,Path=ActualWidth}">-->
 
-                <!--Rectangle to be used for Crop Original Image-->
-                <Rectangle x:Name="rect"
+            <!--Rectangle to be used for Crop Original Image-->
+            <!--<Rectangle x:Name="rect"
                            Height="84"
                            Grid.Row="1"
                            ManipulationMode="Scale"
                            Fill="Transparent"
                            StrokeThickness="2"
-                           Stroke="{StaticResource PhoneAccentBrush}"></Rectangle>
+                           Stroke="{StaticResource PhoneAccentBrush}"></Rectangle>-->
             <!--</Canvas>-->
+            <!--</Grid>-->
         </Grid>
         <!--<Image Grid.Row="1"
                Stretch="UniformToFill"
@@ -100,14 +127,16 @@
                           Fill="White"
                           Stretch="Uniform" />
                 </Grid>
-                <!--<Grid Grid.Column="4"
+                <Grid Grid.Column="4"
+                      Name="grdLibrary"
+                      Tapped="grdLibrary_Tapped"
                       Background="Transparent"
                       Margin="0,52">
                     <Path Data="M511.458,0H65.572C46.25,0,30.6,15.649,30.6,34.971v507.085c0,19.322,15.65,34.973,34.972,34.973h445.886   c19.321,0,34.972-15.65,34.972-34.973V34.971C546.429,15.649,530.779,0,511.458,0z M65.572,34.971h445.886v402.171H65.572V34.971z    M493.971,419.656H83.057V307.512c0-12.273,4.311-24.165,12.17-33.598l101.924-122.225c10.928-12.765,30.95-11.978,40.917,1.574   l116.017,157.109l59.627-62.948c10.403-10.929,27.715-10.929,38.118,0l29.744,35.172c7.999,9.469,12.396,21.463,12.396,33.87   V419.656z M380.315,126.771c0-26.579,21.507-48.086,48.085-48.086s48.086,21.507,48.086,48.086   c0,26.578-21.508,48.085-48.086,48.085S380.315,153.35,380.315,126.771z"
                           Fill="White"
                           Stretch="Uniform" />
-                </Grid>-->
-                
+                </Grid>
+
                 <c4f:RoundButton ButtonHeight="96"
                                  ButtonWidth="96"
                                  Margin="8"
