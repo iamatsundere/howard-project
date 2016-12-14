@@ -21,8 +21,9 @@
         <Image Name="imgCapped"
                Height="{Binding ElementName=LayoutRoot,Path=ActualHeight}"
                Width="{Binding ElementName=LayoutRoot,Path=ActualWidth}"
+               HorizontalAlignment="Center"
                VerticalAlignment="Center"
-               Stretch="UniformToFill" />
+               Stretch="Uniform" />
         <Grid>
             <!--<cc:ImageCropper x:Name="Crop"
                              Width="128"
