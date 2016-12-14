@@ -24,9 +24,6 @@
                VerticalAlignment="Center"
                Stretch="UniformToFill" />
         <Grid>
-            <cc:ImageCropper x:Name="c"
-                             Width="128"
-                             Height="40" />
             <!--<Grid Name="grdBorder">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />

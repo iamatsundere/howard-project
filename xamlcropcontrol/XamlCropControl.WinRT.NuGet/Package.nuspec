@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>XamlCropControl.WinRT.NuGet</id>
+    <version>1.0.8</version>
+    <title>Xaml Crop Control</title>
+    <authors>Randy Chapman</authors>
+    <owners></owners>
+    <description>
+      This is a simple UI control to allow cropping of an image for XAML apps on WinRT (written in C#).  It supports using a fixed or non-fixed aspect ratio.  It fully supports touch, including pinch/stretch and inertia, as well as mouse control.
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <summary>
+      This is a XAML control for cropping images, implemented in C#. WinRT only.
+    </summary>
+    <language>en-US</language>
+    <projectUrl>https://nuget.org/packages/XamlCropControl.WinRT.NuGet</projectUrl>
+    <iconUrl>http://download-codeplex.sec.s-msft.com/Download/SourceControlFileDownload.ashx?ProjectName=xamlcropcontrol&amp;changeSetId=d5ee6fc387ff0de0e4aeaf3af5add9e75b285c38&amp;itemId=XamlCropControl.WinRT.Sample%2fAssets%2fFullSizeLogo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://xamlcropcontrol.codeplex.com/license</licenseUrl>
+    <copyright>Copyright Randy Chapman 2013</copyright>
+    <dependencies>
+        <group targetFramework="netcore45" />
+    </dependencies>
+    <references></references>
+    <tags></tags>
+  </metadata>
+  <files>
+    <file src="bin\XamlCropControl.WinRT.pri" target="lib\netcore45\XamlCropControl.WinRT.pri" />
+    <file src="bin\XamlCropControl.WinRT.dll" target="lib\netcore45\XamlCropControl.WinRT.dll" />
+    <file src="bin\XamlCropControl.WinRT.pdb" target="lib\netcore45\XamlCropControl.WinRT.pdb" />
+    <file src="..\XamlCropControl.WinRT\bin\XamlCropControl.WinRT.xr.xml" target="lib\netcore45\XamlCropControl.WinRT\XamlCropControl.WinRT.xr.xml" />
+    <file src="..\XamlCropControl.WinRT\bin\*.xbf" target="lib\netcore45\XamlCropControl.WinRT" />
+    <file src="..\XamlCropControl.WinRT\bin\Themes\*.xbf" target="lib\netcore45\XamlCropControl.WinRT\Themes" />
+    <file src="..\XamlCropControl.WinRT\*.xaml" target="lib\netcore45\XamlCropControl.WinRT" />
+    <file src="..\XamlCropControl.WinRT\Themes\*.xaml" target="lib\netcore45\XamlCropControl.WinRT\Themes" />
+  </files>
+</package>
