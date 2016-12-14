@@ -19,6 +19,7 @@ using Windows.Storage.FileProperties;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Input;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -46,16 +47,54 @@ namespace BTLXLA
         // OCR engine instance used to extract text from images.
         private OcrEngine ocrEngine;
 
+        GestureRecognizer gestureRecognizer = new GestureRecognizer();
+
         public MainPage()
         {
+
             this.InitializeComponent();
 
             CompositionTarget.Rendering += CompositionTarget_Rendering;
+            this.Loaded += MainPage_Loaded;
 
             view = CoreApplication.GetCurrentView();
+            this.gestureRecognizer.GestureSettings = Windows.UI.Input.GestureSettings.Tap | Windows.UI.Input.GestureSettings.DoubleTap | Windows.UI.Input.GestureSettings.RightTap | Windows.UI.Input.GestureSettings.Drag;
 
             ocrEngine = new OcrEngine(OcrLanguage.English);
             this.NavigationCacheMode = NavigationCacheMode.Required;
+            
+        }
+
+        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            gestureRecognizer.Tapped += gestureRecognizer_Tapped;
+            gestureRecognizer.RightTapped += gestureRecognizer_RightTapped;
+            gestureRecognizer.CrossSliding += gestureRecognizer_CrossSliding;
+            gestureRecognizer.Dragging += gestureRecognizer_Dragging;
+        }
+
+        void gestureRecognizer_Dragging(Windows.UI.Input.GestureRecognizer sender, Windows.UI.Input.DraggingEventArgs args)
+        {
+            Debug.WriteLine("Slide/swipe gesture recognized");
+
+        }
+
+        void gestureRecognizer_RightTapped(Windows.UI.Input.GestureRecognizer sender, Windows.UI.Input.RightTappedEventArgs args)
+        {
+            Debug.WriteLine("Right Tap gesture recognized");
+
+        }
+
+        void gestureRecognizer_CrossSliding(Windows.UI.Input.GestureRecognizer sender, Windows.UI.Input.CrossSlidingEventArgs args)
+        {
+            Debug.WriteLine("Slide/swipe gesture on a single pivot recognized");
+
+        }
+
+        void gestureRecognizer_Tapped(Windows.UI.Input.GestureRecognizer sender, Windows.UI.Input.TappedEventArgs args)
+        {
+            Debug.WriteLine("Tap gesture recognized");
+
         }
 
         /// <summary>
@@ -492,6 +531,7 @@ namespace BTLXLA
             //Debug.WriteLine("img_PointerMoved " + TempPoint2.X + " " + TempPoint2.Y);
         }
 
+        List<uint> pIds = new List<uint>();
         private void img_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             Point1 = new Point(Canvas.GetLeft(rect), Canvas.GetTop(rect));
@@ -502,10 +542,13 @@ namespace BTLXLA
 
         private void img_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
+            Debug.WriteLine("img_PointerReleased " + pIds.Count);
+            pIds.Clear();
         }
 
         private void rect_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
+            //Debug.WriteLine(pIds.Count);
         }
 
         private void SetPoint(out Point point, UIElement uielement, PointerRoutedEventArgs e)
