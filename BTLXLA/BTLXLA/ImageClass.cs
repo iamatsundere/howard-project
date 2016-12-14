@@ -92,9 +92,9 @@ namespace BTLXLA
 
         public static double[,] ConvolutionFilter(double[,] bmpInput, int[,] maskByte, int bias)
         {
-            double[,] arrRes = new double[bmpInput.GetLength(0), bmpInput.GetLength(0)];
+            double[,] arrRes = new double[bmpInput.GetLength(0), bmpInput.GetLength(1)];
             int intHeight = bmpInput.GetLength(0);
-            int intWidth = bmpInput.GetLength(0);
+            int intWidth = bmpInput.GetLength(1);
             //byte[,] bytData = new byte[intHeight, intWidth];
             //bytData = ImageClass.GetMatrixData(bmpInput);
 
@@ -122,6 +122,23 @@ namespace BTLXLA
             return arrRes;
         }
 
+        public static double[,] Crop(double[,] arrIn, int x, int y, int w, int h)
+        {
+            if (y + h >= arrIn.GetLength(0))
+                h = arrIn.GetLength(0) - y - 1;
+            if (x + w >= arrIn.GetLength(1))
+                w = arrIn.GetLength(1) - x - 1;
+
+            double[,] arrRes = new double[h, w];
+            for (int i = x; i < x + w; i++)
+            {
+                for (int j = y; j < y + h; j++)
+                {
+                    arrRes[j - y, i - x] = arrIn[y, x];
+                }
+            }
+            return arrRes;
+        }
 
         public static double[,] NoiseFilter(double[,] bmpInput, string type)
         {
