@@ -1,0 +1,6 @@
+https://groups.google.com/forum/#!topic/tesseract-ocr/v4sQ9jDptwY
+https://social.msdn.microsoft.com/Forums/en-US/a2b8234a-f713-40ce-a896-fc8b82ccc817/pinch-to-zoom-feature-implementation-in-in-c?forum=winappswithcsharp
+https://www.codeproject.com/Articles/38319/Famous-Otsu-Thresholding-in-C
+https://www.programmingalgorithms.com/algorithm/otsu-threshold
+http://blogs.u2u.net/diederik/post/2013/10/10/An-Image-Cropper-control-for-Windows-8-Store-apps.aspx
+https://xamlcropcontrol.codeplex.com/
