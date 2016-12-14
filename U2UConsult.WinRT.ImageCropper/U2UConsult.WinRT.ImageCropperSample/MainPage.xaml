@@ -18,30 +18,33 @@
                    FontSize="32"
                    Margin="20" />
 
-        <Grid Grid.Row="1" Margin="20">
+        <Grid Grid.Row="1"
+              Margin="20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="20" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            
+
             <Button Grid.Column="0"
                     Height="120"
                     Width="120"
                     Margin="20 0"
                     Content="Open"
-                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
                     Click="OpenButton_Click" />
-            
-            <controls:ImageCropper x:Name="ImageCropper" Grid.Column="1"
+
+            <controls:ImageCropper x:Name="ImageCropper"
+                                   Grid.Column="1"
                                    VerticalAlignment="Stretch"
                                    HorizontalAlignment="Stretch" />
-            
+
             <Grid Grid.Column="3"
                   Background="{StaticResource ApplicationSecondaryForegroundThemeBrush}"
                   Opacity="0.8" />
-            
+
             <Image Grid.Column="3"
                    Source="{Binding CroppedImage, ElementName=ImageCropper}" />
 

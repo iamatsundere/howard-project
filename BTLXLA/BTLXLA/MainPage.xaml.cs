@@ -107,10 +107,10 @@ namespace BTLXLA
             DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
             this.InitCam(Windows.Devices.Enumeration.Panel.Back);
 
-            double top = (LayoutRoot.ActualHeight - rect.ActualHeight) / 2.0;
-            Canvas.SetTop(rect, top);
-            double left = (LayoutRoot.ActualWidth - rect.ActualWidth) / 2.0;
-            Canvas.SetLeft(rect, left);
+            //double top = (LayoutRoot.ActualHeight - rect.ActualHeight) / 2.0;
+            //Canvas.SetTop(rect, top);
+            //double left = (LayoutRoot.ActualWidth - rect.ActualWidth) / 2.0;
+            //Canvas.SetLeft(rect, left);
         }
 
 
@@ -279,14 +279,14 @@ namespace BTLXLA
                 double ratio = fixedSize / fixedDisplay;
                 Debug.WriteLine(ratio);
 
-                double top = Canvas.GetTop(rect);
-                double left = Canvas.GetLeft(rect);
+                //double top = Canvas.GetTop(rect);
+                //double left = Canvas.GetLeft(rect);
 
-                Debug.WriteLine((int)left + " " + (int)top + " " +
-                    (int)(rect.ActualWidth * ratio) + " " + (int)(rect.ActualHeight * ratio));
+                //Debug.WriteLine((int)left + " " + (int)top + " " +
+                //    (int)(rect.ActualWidth * ratio) + " " + (int)(rect.ActualHeight * ratio));
 
-                wb = wb.Crop((int)(left * ratio), (int)(top * ratio),
-                    (int)(rect.ActualWidth * ratio), (int)(rect.ActualHeight * ratio));
+                //wb = wb.Crop((int)(left * ratio), (int)(top * ratio),
+                //    (int)(rect.ActualWidth * ratio), (int)(rect.ActualHeight * ratio));
 
                 {
                     // Check whether is loaded image supported for processing.
@@ -534,7 +534,7 @@ namespace BTLXLA
         List<uint> pIds = new List<uint>();
         private void img_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            Point1 = new Point(Canvas.GetLeft(rect), Canvas.GetTop(rect));
+            //Point1 = new Point(Canvas.GetLeft(rect), Canvas.GetTop(rect));
             SetPoint(out TempPoint1, imgCapped, e);
             TempPoint2 = TempPoint1;
             //Debug.WriteLine("img_PointerPressed " + TempPoint1.X + " " + TempPoint1.Y);
@@ -569,8 +569,8 @@ namespace BTLXLA
             Point tempPoint = new Point(Point1.X + xoffset, Point1.Y + yoffset);
             //Debug.WriteLine(tempPoint.X + " " + tempPoint.Y);
 
-            Canvas.SetLeft(rect, tempPoint.X);
-            Canvas.SetTop(rect, tempPoint.Y);
+            //Canvas.SetLeft(rect, tempPoint.X);
+            //Canvas.SetTop(rect, tempPoint.Y);
         }
         #endregion
     }

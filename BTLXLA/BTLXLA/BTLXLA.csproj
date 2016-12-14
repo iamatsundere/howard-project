@@ -88,7 +88,10 @@
       <DependentUpon>CallPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converter.cs" />
+    <Compile Include="CustomControls\Helpers\CropBitmap.cs" />
+    <Compile Include="CustomControls\Helpers\SelectedRegion.cs" />
     <Compile Include="ImageClass.cs" />
+    <Compile Include="CustomControls\ImageCropper.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -125,6 +128,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="CustomControls\Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Coding4Fun.Toolkit, Version=2.0.8.0, Culture=neutral, PublicKeyToken=c5fd7b72b1a17ce4, processorArchitecture=MSIL">
@@ -147,6 +154,9 @@
   <ItemGroup>
     <None Include="OcrResources\MsOcrRes.orp" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Common\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
