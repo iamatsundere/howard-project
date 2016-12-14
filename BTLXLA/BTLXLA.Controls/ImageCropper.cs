@@ -1,4 +1,4 @@
-﻿namespace BTLXLA.CustomControls
+﻿namespace BTLXLA.Controls
 {
     using Helpers;
     using System;

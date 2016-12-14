@@ -7,6 +7,7 @@
       mc:Ignorable="d"
       xmlns:capture="using:Windows.Media.Capture"
       xmlns:c4f="using:Coding4Fun.Toolkit.Controls"
+      xmlns:cc="using:BTLXLA.Controls"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       RequestedTheme="Dark">
 
@@ -23,6 +24,9 @@
                VerticalAlignment="Center"
                Stretch="UniformToFill" />
         <Grid>
+            <cc:ImageCropper x:Name="c"
+                             Width="128"
+                             Height="40" />
             <!--<Grid Name="grdBorder">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />

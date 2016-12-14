@@ -16,7 +16,7 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
 \***************************************************************************/
 
-namespace BTLXLA.CustomControls.Helpers
+namespace BTLXLA.Controls.Helpers
 {
     using System;
     using System.ComponentModel;
