@@ -27,45 +27,28 @@
             <!--<cc:ImageCropper x:Name="Crop"
                              Width="128"
                              Height="128"/>-->
-            <!--<Grid Name="grdBorder">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
-            <Grid Grid.Row="0"
-                  Name="grdTop">
-                <Image Stretch="UniformToFill"
-                       Opacity=".8"
-                       VerticalAlignment="Bottom"
-                       Source="/Assets/tumblr_static_bf68b8gfk0ocgokw4w8o0go04.jpg" />
-            </Grid>
-            <Grid Grid.Row="2">
-                <Image Stretch="UniformToFill"
-                       Opacity=".8"
-                       VerticalAlignment="Bottom"
-                       Source="/Assets/tumblr_static_bf68b8gfk0ocgokw4w8o0go04.jpg" />
-            </Grid>-->
-            <!--<Canvas Name="ImageLayout"
+            <Canvas Name="ImageLayout"
+                    Grid.Column="1"
                     Grid.Row="1"
-                    Height="84"
-                    Width="{Binding ElementName=LayoutRoot,Path=ActualWidth}">-->
+                    Height="{Binding ElementName=LayoutRoot,Path=ActualHeight}"
+                    Width="{Binding ElementName=LayoutRoot,Path=ActualWidth}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
 
-            <!--Rectangle to be used for Crop Original Image-->
-            <!--<Rectangle x:Name="rect"
-                           Height="84"
-                           Grid.Row="1"
+                <!--Rectangle to be used for Crop Original Image-->
+                <Rectangle x:Name="rect"
+                           Height="100"
+                           Width="384"
+                           ManipulationDelta="rect_ManipulationDelta"
                            ManipulationMode="Scale"
                            Fill="Transparent"
-                           StrokeThickness="2"
-                           Stroke="{StaticResource PhoneAccentBrush}"></Rectangle>-->
-            <!--</Canvas>-->
-            <!--</Grid>-->
+                           PointerMoved="img_PointerMoved"
+                           PointerPressed="img_PointerPressed"
+                           PointerReleased="img_PointerReleased"
+                           StrokeThickness="4"
+                           Stroke="Orange"></Rectangle>
+            </Canvas>
         </Grid>
-        <!--<Image Grid.Row="1"
-               Stretch="UniformToFill"
-               Source="/Assets/6cba12ce-c402-45b5-888b-63de745ff321.jpg"/>-->
         <Grid Height="128"
               VerticalAlignment="Bottom">
 
@@ -119,7 +102,7 @@
                           Stretch="Uniform" />
                 </Grid>
 
-                <!--<c4f:RoundButton ButtonHeight="96"
+                <c4f:RoundButton ButtonHeight="96"
                                  ButtonWidth="96"
                                  Margin="8"
                                  Name="btnCapture"
@@ -129,9 +112,8 @@
                                  BorderBrush="White"
                                  BorderThickness="4"
                                  Background="{StaticResource PhoneAccentBrush}">
-                    <Ellipse Stretch="Uniform" />
-                </c4f:RoundButton>-->
-                <Button MinHeight="96"
+                </c4f:RoundButton>
+                <!--<Button MinHeight="96"
                         MinWidth="96"
                         Margin="8"
                         Name="btnCapture"
@@ -141,7 +123,7 @@
                         BorderBrush="White"
                         BorderThickness="4"
                         Background="{StaticResource PhoneAccentBrush}">
-                </Button>
+                </Button>-->
             </Grid>
         </Grid>
     </Grid>

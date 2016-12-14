@@ -210,6 +210,88 @@ namespace BTLXLA
             return arr;
         }
 
+        #region Otsu algorithm
+        public static int[] GetHistogram(double[,] imageSource)
+        {
+            int[] arrHisto = new int[256];
+            for (int i = 0; i < imageSource.GetLength(0); i++)
+            {
+                for (int j = 0; j < imageSource.GetLength(1); j++)
+                {
+                    for (int k = 0; k < arrHisto.GetLength(0); k++)
+                    {
+                        if ((int)imageSource[i, j] == k)
+                        {
+                            arrHisto[k]++;
+                        }
+                    }
+                }
+            }
+
+            return arrHisto;
+        }
+        private static double Px(int init, int end, int[] histo)
+        {
+            int sum = 0;
+            for (int i = init; i <= end; i++)
+            {
+                sum += histo[i];
+            }
+
+            return (double)sum;
+        }
+        private static double Mx(int init, int end, int[] histo)
+        {
+            int sum = 0;
+            int i;
+            for (i = init; i <= end; i++)
+            {
+                sum += i * histo[i];
+            }
+
+            return (double)sum;
+        }
+
+        private static double FindMax(double[] vector, int n)
+        {
+            double maxVec = 0;
+            int index = 0;
+
+            for (int i = 1; i < n - 1; i++)
+            {
+                if (vector[i] > maxVec)
+                {
+                    maxVec = vector[i];
+                    index = i;
+                }
+            }
+            return index;
+        }
+
+        public static int GetOtsuThreshold(double[,] imageSource)
+        {
+            int[] hist = GetHistogram(imageSource);
+            double[] vet = new double[256];
+            byte target = 0;
+            for (int i = 1; i != 255; i++)
+            {
+                double p1 = Px(0, i, hist);
+                double p2 = Px(i + 1, 255, hist);
+                double p12 = p1 * p2;
+                if (p12 == 0)
+                {
+                    p12 = 1;
+                }
+                double diff = (Mx(0, i, hist) * p2) - (Mx(i + 1, 255, hist) * p1);
+                vet[i] = (double)diff * diff / p12;
+            }
+            target = (byte)FindMax(vet, 256);
+            return target;
+        }
+
+        #endregion
+
+
         //public static WriteableBitmap MakeGrayscale3(WriteableBitmap original)
         //{
         //    try

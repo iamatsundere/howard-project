@@ -67,34 +67,6 @@ namespace BTLXLA
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            gestureRecognizer.Tapped += gestureRecognizer_Tapped;
-            gestureRecognizer.RightTapped += gestureRecognizer_RightTapped;
-            gestureRecognizer.CrossSliding += gestureRecognizer_CrossSliding;
-            gestureRecognizer.Dragging += gestureRecognizer_Dragging;
-        }
-
-        void gestureRecognizer_Dragging(Windows.UI.Input.GestureRecognizer sender, Windows.UI.Input.DraggingEventArgs args)
-        {
-            Debug.WriteLine("Slide/swipe gesture recognized");
-
-        }
-
-        void gestureRecognizer_RightTapped(Windows.UI.Input.GestureRecognizer sender, Windows.UI.Input.RightTappedEventArgs args)
-        {
-            Debug.WriteLine("Right Tap gesture recognized");
-
-        }
-
-        void gestureRecognizer_CrossSliding(Windows.UI.Input.GestureRecognizer sender, Windows.UI.Input.CrossSlidingEventArgs args)
-        {
-            Debug.WriteLine("Slide/swipe gesture on a single pivot recognized");
-
-        }
-
-        void gestureRecognizer_Tapped(Windows.UI.Input.GestureRecognizer sender, Windows.UI.Input.TappedEventArgs args)
-        {
-            Debug.WriteLine("Tap gesture recognized");
-
         }
 
         /// <summary>
@@ -215,7 +187,7 @@ namespace BTLXLA
                 // create storage file in local app storage  
                 TimeSpan span = DateTime.Now.TimeOfDay;
                 string time = String.Format("{0}{1}{2}", span.Hours, span.Minutes, span.Seconds);
-                string fileName = "123xe_" + DateTime.Today.ToString("yyyyMMdd") + "_" + time + ".jpeg";
+                string fileName = "#XLA_" + DateTime.Today.ToString("yyyyMMdd") + "_" + time + ".jpeg";
                 file = await KnownFolders.CameraRoll.CreateFileAsync(fileName, CreationCollisionOption.GenerateUniqueName);
                 //await captureManager.CapturePhotoToStorageFileAsync(imgFormat, file);
 
@@ -279,14 +251,14 @@ namespace BTLXLA
                 double ratio = fixedSize / fixedDisplay;
                 Debug.WriteLine(ratio);
 
-                //double top = Canvas.GetTop(rect);
-                //double left = Canvas.GetLeft(rect);
+                double top = Canvas.GetTop(rect);
+                double left = Canvas.GetLeft(rect);
 
                 //Debug.WriteLine((int)left + " " + (int)top + " " +
                 //    (int)(rect.ActualWidth * ratio) + " " + (int)(rect.ActualHeight * ratio));
 
-                //wb = wb.Crop((int)(left * ratio), (int)(top * ratio),
-                //    (int)(rect.ActualWidth * ratio), (int)(rect.ActualHeight * ratio));
+                wb = wb.Crop((int)(left * ratio), (int)(top * ratio),
+                    (int)(rect.ActualWidth * ratio), (int)(rect.ActualHeight * ratio));
 
                 {
                     // Check whether is loaded image supported for processing.
@@ -357,23 +329,6 @@ namespace BTLXLA
 
                                 };
                                 Debug.WriteLine(5);
-                                // Define position, background, etc.
-                                //var border = new Border()
-                                //{
-                                //    Margin = new Thickness(overlayRect.Left, overlayRect.Top, 0, 0),
-                                //    Height = overlayRect.Height,
-                                //    Width = overlayRect.Width,
-                                //    Background = new SolidColorBrush(Colors.Orange),
-                                //    Opacity = 0.5,
-                                //    HorizontalAlignment = HorizontalAlignment.Left,
-                                //    VerticalAlignment = VerticalAlignment.Top,
-                                //    Child = wordTextBlock,
-
-                                //};
-
-                                //OverlayTextButton.IsEnabled = true;
-                                // Put the filled textblock in the results grid.
-                                //TextOverlay.Children.Add(border);
                                 extractedText += word.Text + " ";
                             }
                         }
@@ -534,7 +489,7 @@ namespace BTLXLA
         List<uint> pIds = new List<uint>();
         private void img_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            //Point1 = new Point(Canvas.GetLeft(rect), Canvas.GetTop(rect));
+            Point1 = new Point(Canvas.GetLeft(rect), Canvas.GetTop(rect));
             SetPoint(out TempPoint1, imgCapped, e);
             TempPoint2 = TempPoint1;
             //Debug.WriteLine("img_PointerPressed " + TempPoint1.X + " " + TempPoint1.Y);
@@ -569,8 +524,8 @@ namespace BTLXLA
             Point tempPoint = new Point(Point1.X + xoffset, Point1.Y + yoffset);
             //Debug.WriteLine(tempPoint.X + " " + tempPoint.Y);
 
-            //Canvas.SetLeft(rect, tempPoint.X);
-            //Canvas.SetTop(rect, tempPoint.Y);
+            Canvas.SetLeft(rect, tempPoint.X);
+            Canvas.SetTop(rect, tempPoint.Y);
         }
         #endregion
     }
