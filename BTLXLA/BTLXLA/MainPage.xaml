@@ -7,10 +7,10 @@
       mc:Ignorable="d"
       xmlns:capture="using:Windows.Media.Capture"
       xmlns:c4f="using:Coding4Fun.Toolkit.Controls"
-      xmlns:cc="using:BTLXLA.Controls"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       RequestedTheme="Dark">
 
+    <!--xmlns:cc="using:BTLXLA.Controls"-->
     <Grid Background="Black"
           Name="LayoutRoot">
 
@@ -24,6 +24,9 @@
                VerticalAlignment="Center"
                Stretch="UniformToFill" />
         <Grid>
+            <!--<cc:ImageCropper x:Name="Crop"
+                             Width="128"
+                             Height="128"/>-->
             <!--<Grid Name="grdBorder">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -116,7 +119,7 @@
                           Stretch="Uniform" />
                 </Grid>
 
-                <c4f:RoundButton ButtonHeight="96"
+                <!--<c4f:RoundButton ButtonHeight="96"
                                  ButtonWidth="96"
                                  Margin="8"
                                  Name="btnCapture"
@@ -127,7 +130,18 @@
                                  BorderThickness="4"
                                  Background="{StaticResource PhoneAccentBrush}">
                     <Ellipse Stretch="Uniform" />
-                </c4f:RoundButton>
+                </c4f:RoundButton>-->
+                <Button MinHeight="96"
+                        MinWidth="96"
+                        Margin="8"
+                        Name="btnCapture"
+                        Tapped="btnCapture_Tapped"
+                        VerticalAlignment="Center"
+                        Grid.Column="2"
+                        BorderBrush="White"
+                        BorderThickness="4"
+                        Background="{StaticResource PhoneAccentBrush}">
+                </Button>
             </Grid>
         </Grid>
     </Grid>
