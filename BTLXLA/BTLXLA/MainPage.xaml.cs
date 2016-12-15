@@ -76,9 +76,11 @@ namespace BTLXLA
         /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
-            this.InitCam(Windows.Devices.Enumeration.Panel.Back);
-
+            if (captureManager == null)
+            {
+                DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
+                this.InitCam(Windows.Devices.Enumeration.Panel.Back);
+            }
             //double top = (LayoutRoot.ActualHeight - rect.ActualHeight) / 2.0;
             //Canvas.SetTop(rect, top);
             //double left = (LayoutRoot.ActualWidth - rect.ActualWidth) / 2.0;
@@ -210,7 +212,7 @@ namespace BTLXLA
                         //wb = await StorageFileToWriteableBitmap(file);
                         //arrImg = ImageClass.MakeGrayscale2Double(wb);
                         // imagePreview is a <Image> object defined in XAML
-                        imgCapped.Source = bmpImage;
+                        //imgCapped.Source = bmpImage;
                     }
                     catch
                     {
@@ -221,22 +223,14 @@ namespace BTLXLA
                 //captureManager = new MediaCapture();
                 //capture.Source = null;
 
-                wb = await Converter.StorageFileToWriteableBitmap(file);
-                Debug.WriteLine(1);
-                byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
-                Debug.WriteLine(2);               
-                int otsuT = ImageClass.GetOtsuThreshold(arrImg);
-                Debug.WriteLine(3);
-                arrImg = ImageClass.OtsuProcessed(arrImg, otsuT);
-                Debug.WriteLine(4);
-                imgCapped.Source = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
+
                 //Frame.Navigate(typeof(CapturedPage), wb);
             }
         }
 
         private void grdReCap_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            imgCapped.Source = null;
+            //imgCapped.Source = null;
             this.InitCam(Windows.Devices.Enumeration.Panel.Back);
         }
 
@@ -263,16 +257,34 @@ namespace BTLXLA
                 double fixedDisplay = (displayedHeight < displayedWidth) ? displayedWidth : displayedHeight;
 
                 double ratio = fixedSize / fixedDisplay;
-                Debug.WriteLine(ratio);
 
                 double top = Canvas.GetTop(rect);
                 double left = Canvas.GetLeft(rect);
+
+                //this action is used to re-calculate the top coordinate of rect
+
 
                 //Debug.WriteLine((int)left + " " + (int)top + " " +
                 //    (int)(rect.ActualWidth * ratio) + " " + (int)(rect.ActualHeight * ratio));
 
                 wb = wb.Crop((int)(left * ratio), (int)(top * ratio),
                     (int)(rect.ActualWidth * ratio), (int)(rect.ActualHeight * ratio));
+
+                Debug.WriteLine(1);
+                byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
+                Debug.WriteLine(2);
+                matrixImage = Converter.ByteArrayToMatrix(arrImg, wb.PixelWidth, 4);
+                Debug.WriteLine(3);
+                int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
+                Debug.WriteLine(4);
+                matrixImage = ImageClass.OtsuProcessed(matrixImage, otsuT);
+                Debug.WriteLine(5);
+                arrImg = Converter.MatrixToByteArray(matrixImage);
+                Debug.WriteLine(6);
+                Debug.WriteLine(arrImg.GetLength(0));
+                ////imgCapped.Source = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
+                wb = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
+
 
                 {
                     // Check whether is loaded image supported for processing.
@@ -297,7 +309,6 @@ namespace BTLXLA
                     // This main API call to extract text from image.
                     var ocrResult = await ocrEngine.RecognizeAsync((uint)wb.PixelHeight, (uint)wb.PixelWidth, wb.PixelBuffer.ToArray());
 
-                    Debug.WriteLine(0);
                     // OCR result does not contain any lines, no text was recognized. 
                     if (ocrResult.Lines != null)
                     {
@@ -326,11 +337,9 @@ namespace BTLXLA
                         // Iterate over recognized lines of text.
                         foreach (var line in ocrResult.Lines)
                         {
-                            Debug.WriteLine(3);
                             // Iterate over words in line.
                             foreach (var word in line.Words)
                             {
-                                Debug.WriteLine(4);
                                 var originalRect = new Rect(word.Left, word.Top, word.Width, word.Height);
                                 var overlayRect = scaleTrasform.TransformBounds(originalRect);
 
@@ -342,11 +351,9 @@ namespace BTLXLA
                                     Text = word.Text,
 
                                 };
-                                Debug.WriteLine(5);
                                 extractedText += word.Text + " ";
                             }
                         }
-                        Debug.WriteLine(7);
                         //txtString.Text = extractedText;
 
                     }
@@ -364,7 +371,7 @@ namespace BTLXLA
             }
             finally
             {
-                imgCapped.Source = null;
+                //imgCapped.Source = null;
                 grdScan.IsTapEnabled = true;
                 btnCapture.IsEnabled = true;
                 ocrEngine = new OcrEngine(OcrLanguage.English);
@@ -401,7 +408,8 @@ namespace BTLXLA
 
                 ImageProperties properties = await file.Properties.GetImagePropertiesAsync();
                 wb = await Converter.StorageFileToWriteableBitmap(file);
-                imgCapped.Source = wb;
+                await this.imgCapped.LoadImage(file);
+                //imgCapped.Source = wb;
             }
         }
 

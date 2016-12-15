@@ -89,7 +89,6 @@ namespace BTLXLA
 
         public static byte[] ConvertBitmapToByteGray(WriteableBitmap bmp)
         {
-            Debug.WriteLine(1);
             byte[] imgBytes = ConvertBitmapToByteArray(bmp);
             byte[] resBytes = new byte[imgBytes.Length];
 
@@ -98,7 +97,6 @@ namespace BTLXLA
             Debug.WriteLine(intHeight + " " + intWidth);
             Debug.WriteLine(imgBytes.Length);
 
-            Debug.WriteLine(2);
             for (int i = 0; i < imgBytes.Length; i += 4)
             {
                 //Debug.WriteLine(imgBytes[i + 0] + " " + imgBytes[i + 1] + " " + imgBytes[i + 2] + " " + imgBytes[i + 3]);
