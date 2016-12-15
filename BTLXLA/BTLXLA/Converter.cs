@@ -187,5 +187,35 @@ namespace BTLXLA
             wb.SetSource((await file.OpenReadAsync()));
             return wb;
         }
+
+        public static double[,] ByteArrayToMatrix(byte[] bytes, int width, int skip)
+        {
+            int height = (bytes.Length / skip) / width;
+            double[,] matrix = new double[height, width];
+            for (int i = 0; i < bytes.Length; i += skip)
+            {
+                int x = (i / skip) % width;
+                int y = (i / skip) / width;
+                matrix[y, x] = (double)bytes[i];
+            }
+            return matrix;
+        }
+        public static byte[] MatrixToByteArray(double[,] matrix)
+        {
+            int height = matrix.GetLength(0);
+            int width = matrix.GetLength(1);
+            byte[] bytes = new byte[height * width * 4];
+            for (int i = 0; i < height; i++)
+                for (int j = 0; j < width; j++)
+                {
+                    int curren_pos = (i * width) * 4 + j * 4;
+                    bytes[curren_pos + 0] = (byte)matrix[i, j];
+                    bytes[curren_pos + 1] = (byte)matrix[i, j];
+                    bytes[curren_pos + 2] = (byte)matrix[i, j];
+                    bytes[curren_pos + 3] = 255;
+                }
+            return bytes;
+        }
+
     }
 }

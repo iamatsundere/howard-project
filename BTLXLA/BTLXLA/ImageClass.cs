@@ -27,7 +27,7 @@ namespace BTLXLA
             {
                 for (int x = 0; x < intWidth; x++)
                 {
-                    Debug.WriteLine(y + " " + x);
+                    //Debug.WriteLine(y + " " + x);
                     if (arr[y, x] < 0)
                     {
                         bmpOutput.SetPixel(x, y, 0);
@@ -58,16 +58,16 @@ namespace BTLXLA
 
         public static double[,] ConvertBitmapToDoubleArr(WriteableBitmap bmp)
         {
-            Debug.WriteLine(1);
+            //Debug.WriteLine(1);
             byte[] imgBytes = ConvertBitmapToByteArray(bmp);
 
             int intHeight = bmp.PixelHeight;
             int intWidth = bmp.PixelWidth;
-            Debug.WriteLine(intHeight + " " + intWidth);
-            Debug.WriteLine(imgBytes.Length);
+            //Debug.WriteLine(intHeight + " " + intWidth);
+            //Debug.WriteLine(imgBytes.Length);
             double[,] bytData = new double[intHeight, intWidth];
 
-            Debug.WriteLine(2);
+            //Debug.WriteLine(2);
             for (int i = 0; i < imgBytes.Length; i += 4)
             {
                 int x = (i / 4) % intWidth;
@@ -267,7 +267,7 @@ namespace BTLXLA
             return arr;
         }
 
-        #region Otsu algorithm
+        #region OTSU ALGORITHM
         public static int[] GetHistogram(double[,] imageSource)
         {
             int[] arrHisto = new int[256];
@@ -344,6 +344,18 @@ namespace BTLXLA
             }
             target = (byte)FindMax(vet, 256);
             return target;
+        }
+
+        public static double[,] OtsuProcessed(double[,] imageSource,int threshold)
+        {
+            for (int j = 0; j < imageSource.GetLength(1); j++)
+            {
+                for (int i = 0; i < imageSource.GetLength(0); i++)
+                {
+                    imageSource[i, j] = imageSource[i, j] > (int)threshold ? 0 : 255;
+                }
+            }
+            return imageSource;
         }
 
         #endregion

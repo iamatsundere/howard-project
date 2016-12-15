@@ -164,6 +164,7 @@ namespace BTLXLA
         public static WriteableBitmap wb;
         StorageFile file;
         BitmapImage bmpImage;
+        double[,] matrixImage;
 
         private async void btnCapture_Tapped(object sender, TappedRoutedEventArgs e)
         {
@@ -221,9 +222,19 @@ namespace BTLXLA
                 //capture.Source = null;
 
                 wb = await Converter.StorageFileToWriteableBitmap(file);
-                //wb = wb.Resize(wb.PixelWidth / 10, wb.PixelHeight / 10, WriteableBitmapExtensions.Interpolation.Bilinear);
+                Debug.WriteLine(1);
                 byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
-                Debug.WriteLine(arrImg.Length);
+                Debug.WriteLine(2);
+                matrixImage = Converter.ByteArrayToMatrix(arrImg, wb.PixelWidth, 4);
+                Debug.WriteLine(matrixImage.GetLength(0) + " " + matrixImage.GetLength(1));
+                Debug.WriteLine(3);
+                int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
+                Debug.WriteLine(4);
+                matrixImage = ImageClass.OtsuProcessed(matrixImage, otsuT);
+                Debug.WriteLine(5);
+                arrImg = Converter.MatrixToByteArray(matrixImage);
+                Debug.WriteLine(6);
+                Debug.WriteLine(arrImg.GetLength(0));
                 imgCapped.Source = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
                 //Frame.Navigate(typeof(CapturedPage), wb);
             }
