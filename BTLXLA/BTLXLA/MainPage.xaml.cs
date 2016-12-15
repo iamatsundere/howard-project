@@ -76,11 +76,8 @@ namespace BTLXLA
         /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (captureManager == null)
-            {
-                DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
-                this.InitCam(Windows.Devices.Enumeration.Panel.Back);
-            }
+            DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
+            this.InitCam(Windows.Devices.Enumeration.Panel.Back);
             //double top = (LayoutRoot.ActualHeight - rect.ActualHeight) / 2.0;
             //Canvas.SetTop(rect, top);
             //double left = (LayoutRoot.ActualWidth - rect.ActualWidth) / 2.0;
@@ -267,6 +264,7 @@ namespace BTLXLA
 
                 byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
                 matrixImage = Converter.ByteArrayToMatrix(arrImg, wb.PixelWidth, 4);
+                matrixImage = ImageClass.ConvolutionFilter(matrixImage, ImageClass.maskSharp1, 1);
                 int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
                 matrixImage = ImageClass.OtsuProcessed(matrixImage, otsuT);
                 arrImg = Converter.MatrixToByteArray(matrixImage);
