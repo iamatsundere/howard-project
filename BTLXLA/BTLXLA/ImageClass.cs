@@ -287,6 +287,24 @@ namespace BTLXLA
 
             return arrHisto;
         }
+
+        public static int[] GetHistogram(byte[] imageSource)
+        {
+            int[] arrHisto = new int[256];
+            for (int i = 0; i < imageSource.GetLength(0); i += 4)
+            {
+                for (int k = 0; k < arrHisto.GetLength(0); k++)
+                {
+                    if ((int)imageSource[i] == k)
+                    {
+                        arrHisto[k]++;
+                    }
+                }
+            }
+
+            return arrHisto;
+        }
+
         private static double Px(int init, int end, int[] histo)
         {
             int sum = 0;
@@ -346,7 +364,28 @@ namespace BTLXLA
             return target;
         }
 
-        public static double[,] OtsuProcessed(double[,] imageSource,int threshold)
+        public static int GetOtsuThreshold(byte[] imageSource)
+        {
+            int[] hist = GetHistogram(imageSource);
+            double[] vet = new double[256];
+            byte target = 0;
+            for (int i = 1; i != 255; i++)
+            {
+                double p1 = Px(0, i, hist);
+                double p2 = Px(i + 1, 255, hist);
+                double p12 = p1 * p2;
+                if (p12 == 0)
+                {
+                    p12 = 1;
+                }
+                double diff = (Mx(0, i, hist) * p2) - (Mx(i + 1, 255, hist) * p1);
+                vet[i] = (double)diff * diff / p12;
+            }
+            target = (byte)FindMax(vet, 256);
+            return target;
+        }
+
+        public static double[,] OtsuProcessed(double[,] imageSource, int threshold)
         {
             for (int j = 0; j < imageSource.GetLength(1); j++)
             {
@@ -354,6 +393,15 @@ namespace BTLXLA
                 {
                     imageSource[i, j] = imageSource[i, j] > (int)threshold ? 0 : 255;
                 }
+            }
+            return imageSource;
+        }
+
+        public static byte[] OtsuProcessed(byte[] imageSource, int threshold)
+        {
+            for (int j = 0; j < imageSource.GetLength(0); j += 4)
+            {
+                imageSource[j] = imageSource[j] > (byte)threshold ? (byte)0 : (byte)255;
             }
             return imageSource;
         }

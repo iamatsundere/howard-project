@@ -224,17 +224,11 @@ namespace BTLXLA
                 wb = await Converter.StorageFileToWriteableBitmap(file);
                 Debug.WriteLine(1);
                 byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
-                Debug.WriteLine(2);
-                matrixImage = Converter.ByteArrayToMatrix(arrImg, wb.PixelWidth, 4);
-                Debug.WriteLine(matrixImage.GetLength(0) + " " + matrixImage.GetLength(1));
+                Debug.WriteLine(2);               
+                int otsuT = ImageClass.GetOtsuThreshold(arrImg);
                 Debug.WriteLine(3);
-                int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
+                arrImg = ImageClass.OtsuProcessed(arrImg, otsuT);
                 Debug.WriteLine(4);
-                matrixImage = ImageClass.OtsuProcessed(matrixImage, otsuT);
-                Debug.WriteLine(5);
-                arrImg = Converter.MatrixToByteArray(matrixImage);
-                Debug.WriteLine(6);
-                Debug.WriteLine(arrImg.GetLength(0));
                 imgCapped.Source = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
                 //Frame.Navigate(typeof(CapturedPage), wb);
             }
