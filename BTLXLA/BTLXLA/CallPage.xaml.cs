@@ -67,7 +67,8 @@ namespace BTLXLA
                 {
                     proString += preString[i];
                 }
-            Windows.ApplicationModel.Calls.PhoneCallManager.ShowPhoneCallUI("Service Provider", "*100*" + proString + "#");
+            Windows.ApplicationModel.Calls.PhoneCallManager.ShowPhoneCallUI("*100*" + proString + "#", "Service Provider");
+            //Windows.ApplicationModel.Calls.PhoneCallManager.ShowPhoneCallUI("0917102712", "Service Provider");
         }
     }
 }

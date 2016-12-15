@@ -135,6 +135,11 @@ namespace BTLXLA
                 }
 
                 await captureManager.StartPreviewAsync();
+
+                if (GetDisplayAspectRatio() == DisplayAspectRatio.FifteenByNine)
+                {
+                    GetFifteenByNineBounds();
+                }
             }
             catch (Exception ex)
             {
@@ -198,11 +203,9 @@ namespace BTLXLA
                 {
                     try
                     {
-                        Debug.WriteLine(9);
                         //because of using statement stream will be closed automatically after copying finished
                         await RandomAccessStream.CopyAsync(imageStream, fileStream.AsOutputStream());
-
-                        Debug.WriteLine(11);
+                        
                         // imagePreview is a <Image> object defined in XAML
                         imgCapped.Source = bmpImage;
                     }
@@ -442,7 +445,7 @@ namespace BTLXLA
         }
 
 
-        #region CAMERA 
+        #region CAMERA HELPERS
         private int flashMode = 0;
         private string[] flashModesPath = new string[]
         {
@@ -473,8 +476,173 @@ namespace BTLXLA
                 }
             }
         }
+
+        /// <summary>
+        /// the display resolution format
+        /// </summary>
+        public enum DisplayAspectRatio
+        {
+            Unknown = -1,
+
+            FifteenByNine = 0,
+
+            SixteenByNine = 1
+        }
+
+
+        /// <summary>
+        /// method to detect DisplayResolutionFormat
+        /// </summary>
+        /// <returns></returns>
+        private DisplayAspectRatio GetDisplayAspectRatio()
+        {
+            DisplayAspectRatio result = DisplayAspectRatio.Unknown;
+
+            //WP8.1 uses logical pixel dimensions, we need to convert this to raw pixel dimensions
+            double logicalPixelWidth = Windows.UI.Xaml.Window.Current.Bounds.Width;
+            double logicalPixelHeight = Windows.UI.Xaml.Window.Current.Bounds.Height;
+
+            double rawPerViewPixels = DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel;
+            double rawPixelHeight = logicalPixelHeight * rawPerViewPixels;
+            double rawPixelWidth = logicalPixelWidth * rawPerViewPixels;
+
+            //calculate and return screen format
+            double relation = Math.Max(rawPixelWidth, rawPixelHeight) / Math.Min(rawPixelWidth, rawPixelHeight);
+            if (Math.Abs(relation - (15.0 / 9.0)) < 0.01)
+            {
+                result = DisplayAspectRatio.FifteenByNine;
+            }
+            else if (Math.Abs(relation - (16.0 / 9.0)) < 0.01)
+            {
+                result = DisplayAspectRatio.SixteenByNine;
+            }
+
+            return result;
+        }
+
+
+
+        /// <summary>
+        /// Helper to get the correct Bounds for 15:9 screens and to set finalPhotoAreaBorder values
+        /// </summary>
+        /// <returns></returns>
+        private BitmapBounds GetFifteenByNineBounds()
+        {
+            BitmapBounds bounds = new BitmapBounds();
+
+            //image size is raw pixels, so we need also here raw pixels
+            double logicalPixelWidth = Windows.UI.Xaml.Window.Current.Bounds.Width;
+            double logicalPixelHeight = Windows.UI.Xaml.Window.Current.Bounds.Height;
+
+            double rawPerViewPixels = DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel;
+            double rawPixelHeight = logicalPixelHeight * rawPerViewPixels;
+            double rawPixelWidth = logicalPixelWidth * rawPerViewPixels;
+
+            //calculate scale factor of UniformToFill Height (remember, we rotated the preview)
+            double scaleFactorVisualHeight = GetMaxResolution().Width / rawPixelHeight;
+
+            //calculate the visual Width 
+            //(because UniFormToFill scaled the previewElement Width down to match the previewElement Height)
+            double visualWidth = GetMaxResolution().Height / scaleFactorVisualHeight;
+
+            //calculate cropping area for 15:9
+            uint scaledBoundsWidth = GetMaxResolution().Height;
+            uint scaledBoundsHeight = (scaledBoundsWidth / 9) * 15;
+
+            //we are starting at the top of the image
+            bounds.Y = 0;
+            //cropping the image width
+            bounds.X = 0;
+            bounds.Height = scaledBoundsHeight;
+            bounds.Width = scaledBoundsWidth;
+
+            //set finalPhotoAreaBorder values that shows the user the area that is captured
+            //finalPhotoAreaBorder.Width = (scaledBoundsWidth / scaleFactorVisualHeight) / rawPerViewPixels;
+            //finalPhotoAreaBorder.Height = (scaledBoundsHeight / scaleFactorVisualHeight) / rawPerViewPixels;
+            //finalPhotoAreaBorder.Margin = new Thickness(
+            //                                Math.Floor(((rawPixelWidth - visualWidth) / 2) / rawPerViewPixels),
+            //                                0,
+            //                                Math.Floor(((rawPixelWidth - visualWidth) / 2) / rawPerViewPixels),
+            //                                0);
+            //finalPhotoAreaBorder.Visibility = Visibility.Visible;
+
+            return bounds;
+        }
         #endregion
 
+
+        #region CAM RES HELPER
+        /// <summary>
+        /// get highest possible resolution
+        /// </summary>
+        /// <returns></returns>
+        private VideoEncodingProperties GetMaxResolution()
+        {
+            VideoEncodingProperties resolutionMax = null;
+
+            //get all photo properties
+            var resolutions = captureManager.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.Photo);
+
+            //generate new list to work with
+            List<VideoEncodingProperties> vidProps = new List<VideoEncodingProperties>();
+
+            //add only those properties that are 16:9 to our own list
+            for (var i = 0; i < resolutions.Count; i++)
+            {
+                VideoEncodingProperties res = (VideoEncodingProperties)resolutions[i];
+
+                if (MatchScreenFormat(new Size(res.Width, res.Height)) != CameraResolutionFormat.FourByThree)
+                {
+                    vidProps.Add(res);
+                }
+            }
+
+            //order the list, and select the highest resolution that fits our limit
+            if (vidProps.Count != 0)
+            {
+                vidProps = vidProps.OrderByDescending(r => r.Width).ToList();
+
+                resolutionMax = vidProps.Where(r => r.Width < 2600).First();
+            }
+
+            return resolutionMax;
+        }
+
+
+        /// <summary>
+        /// the camera resolution format (aspect ratio)
+        /// </summary>
+        public enum CameraResolutionFormat
+        {
+            Unknown = -1,
+
+            FourByThree = 0,
+
+            SixteenByNine = 1
+        }
+
+        /// <summary>
+        /// Helper to detect the correct camera resolution
+        /// </summary>
+        /// <param name="resolution"></param>
+        /// <returns></returns>
+        private CameraResolutionFormat MatchScreenFormat(Size resolution)
+        {
+            CameraResolutionFormat result = CameraResolutionFormat.Unknown;
+
+            double relation = Math.Max(resolution.Width, resolution.Height) / Math.Min(resolution.Width, resolution.Height);
+            if (Math.Abs(relation - (4.0 / 3.0)) < 0.01)
+            {
+                result = CameraResolutionFormat.FourByThree;
+            }
+            else if (Math.Abs(relation - (16.0 / 9.0)) < 0.01)
+            {
+                result = CameraResolutionFormat.SixteenByNine;
+            }
+
+            return result;
+        }
+        #endregion
 
         #region CROPPING
         Point Point1, Point2, TempPoint1, TempPoint2;
