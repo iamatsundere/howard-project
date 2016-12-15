@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="U2UConsult.WinRT.Controls.ImageCropper">
+    <Position X="0.5" Y="0.5" Width="2.75" />
+    <Members>
+      <Method Name="AddCornerEvents" Hidden="true" />
+      <Method Name="Corner_PointerMoved" Hidden="true" />
+      <Method Name="Corner_PointerPressed" Hidden="true" />
+      <Method Name="Corner_PointerReleased" Hidden="true" />
+      <Method Name="ImageCropper" Hidden="true" />
+      <Method Name="OnApplyTemplate" Hidden="true" />
+      <Method Name="SelectRegion_ManipulationCompleted" Hidden="true" />
+      <Method Name="SelectRegion_ManipulationDelta" Hidden="true" />
+      <Method Name="SourceImage_SizeChanged" Hidden="true" />
+      <Method Name="UpdatePreviewImage" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>YwAIAACACQBBUAACAQAAAAAAgFgBFAAQAQABAPgYggg=</HashCode>
+      <FileName>ImageCropper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
