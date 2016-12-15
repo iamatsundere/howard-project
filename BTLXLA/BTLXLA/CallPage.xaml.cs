@@ -40,7 +40,13 @@ namespace BTLXLA
                 txtString.Text = "ERROR";
             else
             {
-                txtString.Text = passed;
+                string proString = "";
+                for (int i = 0; i < passed.Length; i++)
+                    if (passed[i] >= '0' && passed[i] <= '9')
+                    {
+                        proString += passed[i];
+                    }
+                txtString.Text = proString;
                 preString = passed;
             }
 
