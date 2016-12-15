@@ -62,7 +62,7 @@ namespace BTLXLA
 
             ocrEngine = new OcrEngine(OcrLanguage.English);
             this.NavigationCacheMode = NavigationCacheMode.Required;
-            
+
         }
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
@@ -205,7 +205,9 @@ namespace BTLXLA
                     {
                         //because of using statement stream will be closed automatically after copying finished
                         await RandomAccessStream.CopyAsync(imageStream, fileStream.AsOutputStream());
-                        
+
+                        //wb = await StorageFileToWriteableBitmap(file);
+                        //arrImg = ImageClass.MakeGrayscale2Double(wb);
                         // imagePreview is a <Image> object defined in XAML
                         imgCapped.Source = bmpImage;
                     }
@@ -218,7 +220,11 @@ namespace BTLXLA
                 //captureManager = new MediaCapture();
                 //capture.Source = null;
 
-                //wb = await Converter.StorageFileToWriteableBitmap(file);
+                wb = await Converter.StorageFileToWriteableBitmap(file);
+                //wb = wb.Resize(wb.PixelWidth / 10, wb.PixelHeight / 10, WriteableBitmapExtensions.Interpolation.Bilinear);
+                byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
+                Debug.WriteLine(arrImg.Length);
+                imgCapped.Source = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
                 //Frame.Navigate(typeof(CapturedPage), wb);
             }
         }
@@ -570,7 +576,6 @@ namespace BTLXLA
         }
         #endregion
 
-
         #region CAM RES HELPER
         /// <summary>
         /// get highest possible resolution
@@ -697,6 +702,4 @@ namespace BTLXLA
         }
         #endregion
     }
-
-
 }

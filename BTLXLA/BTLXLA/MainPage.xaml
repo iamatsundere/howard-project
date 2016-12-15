@@ -110,6 +110,7 @@
                                  BorderBrush="White"
                                  BorderThickness="4"
                                  Background="{StaticResource PhoneAccentBrush}">
+                    <Ellipse Stretch="Uniform" />
                 </c4f:RoundButton>
                 <!--<Button MinHeight="96"
                         MinWidth="96"

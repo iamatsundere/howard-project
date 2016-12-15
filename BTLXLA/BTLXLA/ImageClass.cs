@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
 using Windows.UI.Xaml.Media.Imaging;
 
@@ -13,17 +15,19 @@ namespace BTLXLA
         public static int[,] maskPrewittDx = new int[3, 3] { { 1, 0, -1 }, { 1, 0, -1 }, { 1, 0, -1 } };
         public static int[,] maskPrewittDy = new int[3, 3] { { -1, -1, -1 }, { 0, 0, 0 }, { 1, 1, 1 } };
 
+
         public static WriteableBitmap ConvertDoubleArrToBitmap(double[,] arr)
         {
-            WriteableBitmap bmpOutput = new WriteableBitmap(arr.GetLength(1), arr.GetLength(0));
             int intHeight = arr.GetLength(0);
             int intWidth = arr.GetLength(1);
+            WriteableBitmap bmpOutput = new WriteableBitmap(intWidth, intHeight);
             byte[,] bytData = new byte[intHeight, intWidth];
 
             for (int y = 0; y < intHeight; y++)
             {
                 for (int x = 0; x < intWidth; x++)
                 {
+                    Debug.WriteLine(y + " " + x);
                     if (arr[y, x] < 0)
                     {
                         bmpOutput.SetPixel(x, y, 0);
@@ -39,22 +43,73 @@ namespace BTLXLA
             return bmpOutput;
         }
 
+        public static WriteableBitmap ConvertByteArrayToBitmap(byte[] arr, int intWidth)
+        {
+            int intHeight = (arr.Length / 4) / intWidth;
+            WriteableBitmap bmpOutput = new WriteableBitmap(intWidth, intHeight);
+            bmpOutput = bmpOutput.FromByteArray(arr);
+            return bmpOutput;
+        }
+        public static byte[] ConvertBitmapToByteArray(WriteableBitmap writeableBitmap)
+        {
+            byte[] pixelArray = writeableBitmap.ToByteArray();
+            return pixelArray;
+        }
+
         public static double[,] ConvertBitmapToDoubleArr(WriteableBitmap bmp)
         {
+            Debug.WriteLine(1);
+            byte[] imgBytes = ConvertBitmapToByteArray(bmp);
+
             int intHeight = bmp.PixelHeight;
             int intWidth = bmp.PixelWidth;
+            Debug.WriteLine(intHeight + " " + intWidth);
+            Debug.WriteLine(imgBytes.Length);
             double[,] bytData = new double[intHeight, intWidth];
 
-            for (int y = 0; y < intHeight; y++)
+            Debug.WriteLine(2);
+            for (int i = 0; i < imgBytes.Length; i += 4)
             {
-                for (int x = 0; x < intWidth; x++)
+                int x = (i / 4) % intWidth;
+                int y = (i / 4) / intWidth;
+                try
                 {
-                    Windows.UI.Color c = bmp.GetPixel(x, y);
-                    double gray = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B;
+                    //Debug.WriteLine(i);
+                    //Windows.UI.Color c = bmp.GetPixel(x, y);
+                    double gray = 0.299 * imgBytes[i + 1] + 0.587 * imgBytes[i + 2] + 0.114 * imgBytes[i + 3];
                     bytData[y, x] = gray;
+                }
+                catch
+                {
+                    Debug.WriteLine(y + " " + x);
                 }
             }
             return bytData;
+        }
+
+        public static byte[] ConvertBitmapToByteGray(WriteableBitmap bmp)
+        {
+            Debug.WriteLine(1);
+            byte[] imgBytes = ConvertBitmapToByteArray(bmp);
+            byte[] resBytes = new byte[imgBytes.Length];
+
+            int intHeight = bmp.PixelHeight;
+            int intWidth = bmp.PixelWidth;
+            Debug.WriteLine(intHeight + " " + intWidth);
+            Debug.WriteLine(imgBytes.Length);
+
+            Debug.WriteLine(2);
+            for (int i = 0; i < imgBytes.Length; i += 4)
+            {
+                //Debug.WriteLine(imgBytes[i + 0] + " " + imgBytes[i + 1] + " " + imgBytes[i + 2] + " " + imgBytes[i + 3]);
+                //Windows.UI.Color c = bmp.GetPixel(x, y);
+                double gray = 0.299 * imgBytes[i + 0] + 0.587 * imgBytes[i + 1] + 0.114 * imgBytes[i + 2];
+                resBytes[i + 3] = imgBytes[i + 3];
+                resBytes[i + 0] = (byte)gray;
+                resBytes[i + 1] = (byte)gray;
+                resBytes[i + 2] = (byte)gray;
+            }
+            return resBytes;
         }
 
 
@@ -195,6 +250,8 @@ namespace BTLXLA
         public static double[,] MakeGrayscale2Double(WriteableBitmap original)
         {
             double[,] arr = new double[original.PixelHeight, original.PixelHeight];
+
+            Debug.WriteLine(original.PixelHeight + " " + original.PixelHeight);
             int intHeight = original.PixelHeight;
             int intWidth = original.PixelHeight;
 
