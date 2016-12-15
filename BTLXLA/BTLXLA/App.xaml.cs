@@ -8,7 +8,6 @@ using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Phone.UI.Input;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -43,14 +42,6 @@ namespace BTLXLA
 #endif
         }
 
-        private async void HideStatusbar()
-        {
-            StatusBar statusBar = Windows.UI.ViewManagement.StatusBar.GetForCurrentView();
-
-            // Hide the status bar
-            await statusBar.HideAsync();
-        }
-
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used when the application is launched to open a specific file, to display
@@ -59,7 +50,6 @@ namespace BTLXLA
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            HideStatusbar();
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {

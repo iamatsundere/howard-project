@@ -19,11 +19,12 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         Stretch="UniformToFill" />
-        <!--<Image Name="imgCapped"
-               VerticalAlignment="Top"
-               Stretch="UniformToFill" />-->
+        <Image Name="imgCapped"
+               Stretch="UniformToFill" />
         <Grid>
-
+            <!--<cc:ImageCropper x:Name="rect"
+                             Width="128"
+                             Height="128"/>-->
             <Canvas Name="ImageLayout"
                     Grid.Column="1"
                     Grid.Row="1"
@@ -46,11 +47,6 @@
                            Stroke="Orange"></Rectangle>
             </Canvas>
         </Grid>
-
-        <cc:ImageCropper x:Name="imgCapped"
-                         VerticalAlignment="Stretch"
-                         HorizontalAlignment="Stretch" 
-                         Margin="16"/>
         <Grid Height="128"
               VerticalAlignment="Bottom">
 
