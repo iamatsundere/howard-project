@@ -21,10 +21,11 @@
                         Stretch="UniformToFill" />
         <Image Name="imgCapped"
                Stretch="UniformToFill" />
+
+        <cc:ImageCropper x:Name="rectCrop"
+                         VerticalAlignment="Stretch"
+                         HorizontalAlignment="Stretch"/>
         <Grid>
-            <!--<cc:ImageCropper x:Name="rect"
-                             Width="128"
-                             Height="128"/>-->
             <Canvas Name="ImageLayout"
                     Grid.Column="1"
                     Grid.Row="1"
