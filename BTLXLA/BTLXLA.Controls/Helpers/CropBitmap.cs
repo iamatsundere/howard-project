@@ -29,6 +29,7 @@
 namespace BTLXLA.Controls.Helpers
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Runtime.InteropServices.WindowsRuntime;
     using System.Threading.Tasks;
@@ -63,7 +64,7 @@ namespace BTLXLA.Controls.Helpers
             {
                 scale = 1;
             }
-
+            
             // Convert start point and size to integer.
             uint startPointX = (uint)Math.Floor(startPoint.X * scale);
             uint startPointY = (uint)Math.Floor(startPoint.Y * scale);
@@ -72,7 +73,6 @@ namespace BTLXLA.Controls.Helpers
 
             using (IRandomAccessStream stream = await originalImageFile.OpenReadAsync())
             {
-
                 // Create a decoder from the stream. With the decoder, we can get 
                 // the properties of the image.
                 BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
@@ -80,8 +80,7 @@ namespace BTLXLA.Controls.Helpers
                 // The scaledSize of original image.
                 uint scaledWidth = (uint)Math.Floor(decoder.PixelWidth * scale);
                 uint scaledHeight = (uint)Math.Floor(decoder.PixelHeight * scale);
-
-
+                
                 // Refine the start point and the size. 
                 if (startPointX + width > scaledWidth)
                 {
@@ -99,11 +98,13 @@ namespace BTLXLA.Controls.Helpers
 
                 // Stream the bytes into a WriteableBitmap
                 WriteableBitmap cropBmp = new WriteableBitmap((int)width, (int)height);
+
                 Stream pixStream = cropBmp.PixelBuffer.AsStream();
                 pixStream.Write(pixels, 0, (int)(width * height * 4));
-
+                
                 return cropBmp;
             }
+            //return null;
         }
 
         /// <summary>

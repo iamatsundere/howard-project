@@ -123,6 +123,7 @@
                 }
                 else
                 {
+
                 }
 
                 if (sourceImageScale == 0)
@@ -134,48 +135,17 @@
                     // throw new InvalidOperationException("ImageCropper is not visible.");
                 }
 
+                Debug.WriteLine("sourceImageScale " + sourceImageScale);
+
                 this.sourceImage.Source = await CropBitmap.GetCroppedBitmapAsync(
                     this.sourceImageFile,
-                    new Point(50, 50),
+                    new Point(0, 0),
                     new Size(this.sourceImagePixelWidth, this.sourceImagePixelHeight),
                     sourceImageScale);
 
                 this.CroppedImage = null;
             }
         }
-
-        ///// <summary>
-        ///// Loads the image.
-        ///// </summary>
-        ///// <param name="wb">WritableBitmap image.</param>
-        ///// <exception cref="System.ArgumentOutOfRangeException">imageFile;Image is too small.</exception>
-        //public void LoadImage(WriteableBitmap wb)
-        //{
-        //    double sourceImageScale = 1;
-
-        //    if (this.sourceImagePixelHeight > this.layoutRoot.ActualHeight ||
-        //        this.sourceImagePixelWidth > this.layoutRoot.ActualWidth)
-        //    {
-        //        sourceImageScale = Math.Min(this.layoutRoot.ActualWidth / this.sourceImagePixelWidth,
-        //             this.layoutRoot.ActualHeight / this.sourceImagePixelHeight);
-        //    }
-        //    else
-        //    {
-        //    }
-
-        //    if (sourceImageScale == 0)
-        //    {
-        //        // Control is invisible, unable to scale the source image.
-        //        return;
-
-        //        // This would be a bit harsh:
-        //        // throw new InvalidOperationException("ImageCropper is not visible.");
-        //    }
-
-        //    this.sourceImage.Source = wb;
-
-        //    this.CroppedImage = null;
-        //}
 
         /// <summary>
         /// Invoked whenever application code or internal processes (such as a rebuilding layout pass) call ApplyTemplate. In simplest terms, this means the method is called just before a UI element displays in your app. Override this method to influence the default post-template logic of a class.
@@ -291,30 +261,30 @@
         private async void UpdatePreviewImage()
         {
             Debug.WriteLine("UpdatePreviewImage");
-            double sourceImageWidthScale = this.imageCanvas.Width / this.sourceImagePixelWidth;
-            double sourceImageHeightScale = this.imageCanvas.Height / this.sourceImagePixelHeight;
+            //double sourceImageWidthScale = this.imageCanvas.Width / this.sourceImagePixelWidth;
+            //double sourceImageHeightScale = this.imageCanvas.Height / this.sourceImagePixelHeight;
 
-            Size previewImageSize = new Size(
-                this.selectedRegion.SelectedRect.Width / sourceImageWidthScale,
-                this.selectedRegion.SelectedRect.Height / sourceImageHeightScale);
+            //Size previewImageSize = new Size(
+            //    this.selectedRegion.SelectedRect.Width / sourceImageWidthScale,
+            //    this.selectedRegion.SelectedRect.Height / sourceImageHeightScale);
 
-            double previewImageScale = 1;
+            //double previewImageScale = 1;
 
-            if (previewImageSize.Width <= this.imageCanvas.Width &&
-                previewImageSize.Height <= this.imageCanvas.Height)
-            {
-            }
-            else
-            {
-                previewImageScale = Math.Min(this.imageCanvas.Width / previewImageSize.Width,
-                    this.imageCanvas.Height / previewImageSize.Height);
-            }
+            //if (previewImageSize.Width <= this.imageCanvas.Width &&
+            //    previewImageSize.Height <= this.imageCanvas.Height)
+            //{
+            //}
+            //else
+            //{
+            //    previewImageScale = Math.Min(this.imageCanvas.Width / previewImageSize.Width,
+            //        this.imageCanvas.Height / previewImageSize.Height);
+            //}
 
-            this.CroppedImage = await CropBitmap.GetCroppedBitmapAsync(
-                   this.sourceImageFile,
-                   new Point(this.selectedRegion.SelectedRect.X / sourceImageWidthScale, this.selectedRegion.SelectedRect.Y / sourceImageHeightScale),
-                   previewImageSize,
-                   previewImageScale);
+            //this.CroppedImage = await CropBitmap.GetCroppedBitmapAsync(
+            //       this.sourceImageFile,
+            //       new Point(this.selectedRegion.SelectedRect.X / sourceImageWidthScale, this.selectedRegion.SelectedRect.Y / sourceImageHeightScale),
+            //       previewImageSize,
+            //       previewImageScale);
         }
 
         /// <summary>
@@ -357,6 +327,21 @@
             else
             {
                 this.imageCanvas.Visibility = Windows.UI.Xaml.Visibility.Visible;
+
+                //OLD CODE
+                //this.imageCanvas.Height = e.NewSize.Height;
+                //this.imageCanvas.Width = e.NewSize.Width;
+                //this.selectedRegion.OuterRect = new Rect(0, 0, e.NewSize.Width, e.NewSize.Height);
+
+                //// Always Reset Selected Region
+                //this.selectedRegion.ResetCorner(0, 0, e.NewSize.Width, e.NewSize.Height);
+
+                //NEW CODE
+                uint rootH = (uint)this.layoutRoot.ActualHeight;
+                uint rootW = (uint)this.layoutRoot.ActualWidth;
+
+                uint sizeWidth = 300;
+                uint sizeHeight = 128;
 
                 this.imageCanvas.Height = e.NewSize.Height;
                 this.imageCanvas.Width = e.NewSize.Width;
