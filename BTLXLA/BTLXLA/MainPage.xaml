@@ -19,13 +19,11 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         Stretch="UniformToFill" />
+
         <Image Name="imgCapped"
                Stretch="UniformToFill" />
 
-        <cc:ImageCropper x:Name="rectCrop"
-                         VerticalAlignment="Stretch"
-                         HorizontalAlignment="Stretch"/>
-        <Grid>
+        <!--<Grid>
             <Canvas Name="ImageLayout"
                     Grid.Column="1"
                     Grid.Row="1"
@@ -34,7 +32,7 @@
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center">
 
-                <!--Rectangle to be used for Crop Original Image-->
+                --><!--Rectangle to be used for Crop Original Image--><!--
                 <Rectangle x:Name="rect"
                            Height="100"
                            Width="384"
@@ -47,7 +45,12 @@
                            StrokeThickness="4"
                            Stroke="Orange"></Rectangle>
             </Canvas>
-        </Grid>
+        </Grid>-->
+
+        <cc:ImageCropper x:Name="rectCrop"
+                         VerticalAlignment="Stretch"
+                         HorizontalAlignment="Stretch" />
+
         <Grid Height="128"
               VerticalAlignment="Bottom">
 
