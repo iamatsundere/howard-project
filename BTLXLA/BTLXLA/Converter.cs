@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Graphics.Imaging;
 using Windows.Storage.FileProperties;
+using System.Diagnostics;
 
 namespace BTLXLA
 {
@@ -159,6 +160,8 @@ namespace BTLXLA
                 BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoderGuid, stream);
                 Stream pixelStream = WB.PixelBuffer.AsStream();
                 byte[] pixels = new byte[pixelStream.Length];
+                Debug.WriteLine("pixels " + pixels.Length);
+                Debug.WriteLine(pixels);
                 await pixelStream.ReadAsync(pixels, 0, pixels.Length);
                 encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore,
                           (uint)WB.PixelWidth,

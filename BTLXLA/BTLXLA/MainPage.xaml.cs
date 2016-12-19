@@ -86,11 +86,10 @@ namespace BTLXLA
         {
             try
             {
-                rectCrop.Visibility = Visibility.Collapsed;
+                //rectCrop.Visibility = Visibility.Collapsed;
 
-                //string fileName = "#BTLXLA_DEFAULT.jpeg";
-                //file = await KnownFolders.CameraRoll.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-                //await rectCrop.LoadImage(file);
+                StorageFile file = await Converter.WriteableBitmapToStorageFile(new WriteableBitmap(384, 384), Converter.FileFormat.Jpeg);
+                await rectCrop.LoadImage(file);
 
                 if (captureManager != null)
                 {
@@ -130,7 +129,6 @@ namespace BTLXLA
                     if (flashMode == 1)
                     {
                         captureManager.VideoDeviceController.FlashControl.Enabled = false;
-                        //captureManager.MediaCaptureSettings.
                     }
                     else if (flashMode == 0)
                     {
