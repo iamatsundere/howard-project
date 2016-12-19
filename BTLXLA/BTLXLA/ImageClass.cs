@@ -222,6 +222,7 @@ namespace BTLXLA
             return arrRes;
         }
 
+        #region MEDIAN, MAX, MIN FILTERING
         public static double[,] NoiseFilter(double[,] bmpInput, string type)
         {
             Debug.WriteLine("NoiseFilter");
@@ -272,6 +273,7 @@ namespace BTLXLA
                 return (byte)arrI[0];
             return 0;
         }
+        #endregion
 
         public static void MakeGrayscale2Bitmap(WriteableBitmap original)
         {
@@ -445,7 +447,6 @@ namespace BTLXLA
         }
 
         #endregion
-
 
         #region BASE FUNCTIONS
 
@@ -714,7 +715,6 @@ namespace BTLXLA
             //bmpInput.UnlockBits(bmpData);
         }
 
-
         public static void HistogramEqu(WriteableBitmap bmpInput)
         {
             //// Lock the bitmap's bits.
@@ -822,6 +822,7 @@ namespace BTLXLA
             //// Unlock the bits.
             //bmpInput.UnlockBits(bmpData);
         }
+
         public static void HistogramStatistic(WriteableBitmap bmpInput)
         {
             //// Lock the bitmap's bits.  
@@ -871,6 +872,7 @@ namespace BTLXLA
             //// Unlock the bits.
             //bmpInput.UnlockBits(bmpData);
         }
+
         public static void LogicOperators(WriteableBitmap bmpInput, WriteableBitmap orMark, WriteableBitmap AndMark)
         {
             //// Lock the bitmap's bits.  
@@ -923,6 +925,7 @@ namespace BTLXLA
             //orMark.UnlockBits(bmpDataOr);
             //AndMark.UnlockBits(bmpDataAnd);
         }
+
         public static void Subtraction(WriteableBitmap bmpInput, WriteableBitmap bmpSub)
         {
             //// Lock the bitmap's bits.  
@@ -1221,7 +1224,6 @@ namespace BTLXLA
         Complex[,] data;
 
         #endregion
-
 
         static private int PointCalc(byte[,] bytImage, int[,] intMask, int X, int Y)
         {
