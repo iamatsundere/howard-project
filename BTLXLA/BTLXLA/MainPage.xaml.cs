@@ -228,141 +228,131 @@ namespace BTLXLA
 
         private async void grdScan_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            //try
-            //{
-            //    // Prevent another OCR request, since only image can be processed at the time at same OCR engine instance.
-            //    grdScan.IsTapEnabled = false;
-            //    btnCapture.IsEnabled = false;
-            //    string extractedText = "";
+            try
+            {
+                // Prevent another OCR request, since only image can be processed at the time at same OCR engine instance.
+                grdScan.IsTapEnabled = false;
+                btnCapture.IsEnabled = false;
+                string extractedText = "";
 
-            //    //Debug.WriteLine(bmpImage.PixelWidth + " " + bmpImage.PixelHeight);
-            //    //From stream to WriteableBitmap
-            //    wb = await StorageFileToWriteableBitmap(file);
+                //Debug.WriteLine(bmpImage.PixelWidth + " " + bmpImage.PixelHeight);
+                //From stream to WriteableBitmap
+                wb = await StorageFileToWriteableBitmap(file);
 
-            //    int fixedSize = (wb.PixelHeight < wb.PixelWidth) ? wb.PixelWidth : wb.PixelHeight;
-
-
-            //    //// Get the size of the image when it is displayed on the phone
-            //    double displayedWidth = imgCapped.ActualWidth;
-            //    double displayedHeight = imgCapped.ActualHeight;
-
-            //    double fixedDisplay = (displayedHeight < displayedWidth) ? displayedWidth : displayedHeight;
-
-            //    double ratio = fixedSize / fixedDisplay;
-
-            //    double top = Canvas.GetTop(rect);
-            //    double left = Canvas.GetLeft(rect);
-
-            //    //this action is used to re-calculate the top coordinate of rect
-            //    Debug.WriteLine(LayoutRoot.ActualHeight - wb.PixelHeight / ratio);
-            //    top = top + (LayoutRoot.ActualHeight - wb.PixelHeight / ratio);
-
-            //    //Debug.WriteLine((int)left + " " + (int)top + " " +
-            //    //    (int)(rect.ActualWidth * ratio) + " " + (int)(rect.ActualHeight * ratio));
-
-            //    wb = wb.Crop((int)(left * ratio), (int)(top * ratio),
-            //        (int)(rect.ActualWidth * ratio), (int)(rect.ActualHeight * ratio));
-
-            //    byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
-            //    matrixImage = Converter.ByteArrayToMatrix(arrImg, wb.PixelWidth, 4);
-            //    matrixImage = ImageClass.ConvolutionFilter(matrixImage, ImageClass.maskSharp1, 1);
-            //    int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
-            //    matrixImage = ImageClass.OtsuProcessed(matrixImage, otsuT);
-            //    arrImg = Converter.MatrixToByteArray(matrixImage);
-            //    //imgCapped.Source = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
-            //    wb = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
+                int fixedSize = (wb.PixelHeight < wb.PixelWidth) ? wb.PixelWidth : wb.PixelHeight;
 
 
-            //    {
-            //        // Check whether is loaded image supported for processing.
-            //        // Supported image dimensions are between 40 and 2600 pixels.
-            //        if (wb.PixelHeight < 40 ||
-            //            wb.PixelHeight > 2600 ||
-            //            wb.PixelWidth < 40 ||
-            //            wb.PixelWidth > 2600)
-            //        {
-            //            MessageDialog dialog = new MessageDialog("Image size is not supported." +
-            //                                Environment.NewLine +
-            //                                "Loaded image size is " + wb.PixelWidth + "x" + wb.PixelHeight + "." +
-            //                                Environment.NewLine +
-            //                                "Supported image dimensions are between 40 and 2600 pixels.");
-            //            await dialog.ShowAsync();
-            //            //ImageText.Style = (Style)Application.Current.Resources["RedTextStyle"];
+                //// Get the size of the image when it is displayed on the phone
+                double displayedWidth = imgCapped.ActualWidth;
+                double displayedHeight = imgCapped.ActualHeight;
 
-            //            return;
-            //        }
+                double fixedDisplay = (displayedHeight < displayedWidth) ? displayedWidth : displayedHeight;
 
-            //        Debug.WriteLine(-1);
-            //        // This main API call to extract text from image.
-            //        var ocrResult = await ocrEngine.RecognizeAsync((uint)wb.PixelHeight, (uint)wb.PixelWidth, wb.PixelBuffer.ToArray());
+                double ratio = fixedSize / fixedDisplay;
 
-            //        // OCR result does not contain any lines, no text was recognized. 
-            //        if (ocrResult.Lines != null)
-            //        {
-            //            // Used for text overlay.
-            //            // Prepare scale transform for words since image is not displayed in original format.
-            //            var scaleTrasform = new ScaleTransform
-            //            {
-            //                CenterX = 0,
-            //                CenterY = 0,
-            //                ScaleX = imgCapped.ActualWidth / wb.PixelWidth,
-            //                ScaleY = imgCapped.ActualHeight / wb.PixelHeight,
-            //            };
+                //double top = Canvas.GetTop(rect);
+                //double left = Canvas.GetLeft(rect);
 
-            //            if (ocrResult.TextAngle != null)
-            //            {
+                //this action is used to re-calculate the top coordinate of rect
+                //Debug.WriteLine(LayoutRoot.ActualHeight - wb.PixelHeight / ratio);
+                //top = top + (LayoutRoot.ActualHeight - wb.PixelHeight / ratio);
 
-            //                imgCapped.RenderTransform = new RotateTransform
-            //                {
-            //                    Angle = (double)ocrResult.TextAngle,
-            //                    CenterX = imgCapped.ActualWidth / 2,
-            //                    CenterY = imgCapped.ActualHeight / 2
-            //                };
-            //            }
+                //Debug.WriteLine((int)left + " " + (int)top + " " +
+                //    (int)(rect.ActualWidth * ratio) + " " + (int)(rect.ActualHeight * ratio));
 
-            //            Debug.WriteLine(2);
-            //            // Iterate over recognized lines of text.
-            //            foreach (var line in ocrResult.Lines)
-            //            {
-            //                // Iterate over words in line.
-            //                foreach (var word in line.Words)
-            //                {
-            //                    var originalRect = new Rect(word.Left, word.Top, word.Width, word.Height);
-            //                    var overlayRect = scaleTrasform.TransformBounds(originalRect);
+                //wb = wb.Crop((int)(left * ratio), (int)(top * ratio),
+                //    (int)(rect.ActualWidth * ratio), (int)(rect.ActualHeight * ratio));
+                wb = rectCrop.CroppedImage;
 
-            //                    var wordTextBlock = new TextBlock()
-            //                    {
-            //                        Height = overlayRect.Height,
-            //                        Width = overlayRect.Width,
-            //                        FontSize = overlayRect.Height * 0.8,
-            //                        Text = word.Text,
+                //byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
+                //matrixImage = Converter.ByteArrayToMatrix(arrImg, wb.PixelWidth, 4);
+                //matrixImage = ImageClass.ConvolutionFilter(matrixImage, ImageClass.maskSharp1, 1);
+                //int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
+                //matrixImage = ImageClass.OtsuProcessed(matrixImage, otsuT);
+                //arrImg = Converter.MatrixToByteArray(matrixImage);
+                ////imgCapped.Source = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
+                //wb = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
 
-            //                    };
-            //                    extractedText += word.Text + " ";
-            //                }
-            //            }
-            //            //txtString.Text = extractedText;
 
-            //        }
-            //        else
-            //        {
-            //            extractedText = "";
-            //        }
-            //        Frame.Navigate(typeof(CallPage), extractedText);
+                {
+                    // Check whether is loaded image supported for processing.
+                    // Supported image dimensions are between 40 and 2600 pixels.
+                    if (wb.PixelHeight < 40 ||
+                        wb.PixelHeight > 2600 ||
+                        wb.PixelWidth < 40 ||
+                        wb.PixelWidth > 2600)
+                    {
+                        MessageDialog dialog = new MessageDialog("Image size is not supported." +
+                                            Environment.NewLine +
+                                            "Loaded image size is " + wb.PixelWidth + "x" + wb.PixelHeight + "." +
+                                            Environment.NewLine +
+                                            "Supported image dimensions are between 40 and 2600 pixels.");
+                        await dialog.ShowAsync();
 
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Debug.WriteLine(ex.Message);
-            //}
-            //finally
-            //{
-            //    imgCapped.Source = null;
-            //    grdScan.IsTapEnabled = true;
-            //    btnCapture.IsEnabled = true;
-            //    ocrEngine = new OcrEngine(OcrLanguage.English);
-            //}
+                        return;
+                    }
+
+                    Debug.WriteLine(-1);
+                    // This main API call to extract text from image.
+                    var ocrResult = await ocrEngine.RecognizeAsync((uint)wb.PixelHeight, (uint)wb.PixelWidth, wb.PixelBuffer.ToArray());
+
+                    // OCR result does not contain any lines, no text was recognized. 
+                    if (ocrResult.Lines != null)
+                    {
+                        // Used for text overlay.
+                        // Prepare scale transform for words since image is not displayed in original format.
+                        var scaleTrasform = new ScaleTransform
+                        {
+                            CenterX = 0,
+                            CenterY = 0,
+                            ScaleX = imgCapped.ActualWidth / wb.PixelWidth,
+                            ScaleY = imgCapped.ActualHeight / wb.PixelHeight,
+                        };
+
+                        if (ocrResult.TextAngle != null)
+                        {
+
+                            imgCapped.RenderTransform = new RotateTransform
+                            {
+                                Angle = (double)ocrResult.TextAngle,
+                                CenterX = imgCapped.ActualWidth / 2,
+                                CenterY = imgCapped.ActualHeight / 2
+                            };
+                        }
+
+                        Debug.WriteLine(2);
+                        // Iterate over recognized lines of text.
+                        foreach (var line in ocrResult.Lines)
+                        {
+                            // Iterate over words in line.
+                            foreach (var word in line.Words)
+                            {
+                                Debug.WriteLine(word.Text);
+                                extractedText += word.Text;
+                            }
+                            break;
+                        }
+
+                    }
+                    else
+                    {
+                        extractedText = "";
+                    }
+                    Frame.Navigate(typeof(CallPage), extractedText);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            finally
+            {
+                imgCapped.Source = null;
+                grdScan.IsTapEnabled = true;
+                btnCapture.IsEnabled = true;
+                ocrEngine = new OcrEngine(OcrLanguage.English);
+            }
         }
 
 
