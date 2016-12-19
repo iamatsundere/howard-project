@@ -87,6 +87,16 @@
             }
         }
 
+        /// <summary>
+        /// Loads the image.
+        /// </summary>
+        /// <param name="imageFile">The image file.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">imageFile;Image is too small.</exception>
+        public void InitCropper()
+        {
+            this.sourceImage.Source = null;
+            this.CroppedImage = null;
+        }
 
         /// <summary>
         /// Loads the image.
@@ -135,13 +145,62 @@
                     // throw new InvalidOperationException("ImageCropper is not visible.");
                 }
 
-                //Debug.WriteLine("sourceImageScale " + sourceImageScale);
-
                 this.sourceImage.Source = await CropBitmap.GetCroppedBitmapAsync(
                     this.sourceImageFile,
                     new Point(0, 0),
                     new Size(this.sourceImagePixelWidth, this.sourceImagePixelHeight),
                     sourceImageScale);
+
+                this.CroppedImage = null;
+            }
+        }
+
+
+
+        /// <summary>
+        /// Loads the image.
+        /// </summary>
+        /// <param name="imageFile">The image file.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">imageFile;Image is too small.</exception>
+        public void LoadImageBitmap(WriteableBitmap wb)
+        {
+            //Debug.WriteLine("LoadImage");
+            this.sourceImagePixelHeight = (uint)wb.PixelHeight;
+            this.sourceImagePixelWidth = (uint)wb.PixelWidth;
+
+            if (this.sourceImagePixelHeight < 2 * CornerSize ||
+                this.sourceImagePixelWidth < 2 * CornerSize)
+            {
+                // Image too small.
+                throw new ArgumentOutOfRangeException("imageFile", "Image is too small.");
+            }
+            else
+            {
+                double sourceImageScale = 1;
+
+                if (this.sourceImagePixelHeight > this.layoutRoot.ActualHeight ||
+                    this.sourceImagePixelWidth > this.layoutRoot.ActualWidth)
+                {
+                    sourceImageScale = Math.Min(this.layoutRoot.ActualWidth / this.sourceImagePixelWidth,
+                         this.layoutRoot.ActualHeight / this.sourceImagePixelHeight);
+                }
+                else
+                {
+
+                }
+
+                if (sourceImageScale == 0)
+                {
+                    // Control is invisible, unable to scale the source image.
+                    return;
+
+                    // This would be a bit harsh:
+                    // throw new InvalidOperationException("ImageCropper is not visible.");
+                }
+
+                //Debug.WriteLine("sourceImageScale " + sourceImageScale);
+
+                this.sourceImage.Source = wb;
 
                 this.CroppedImage = null;
             }
