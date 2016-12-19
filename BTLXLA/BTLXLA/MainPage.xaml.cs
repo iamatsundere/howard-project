@@ -61,7 +61,7 @@ namespace BTLXLA
             this.gestureRecognizer.GestureSettings = Windows.UI.Input.GestureSettings.Tap | Windows.UI.Input.GestureSettings.DoubleTap | Windows.UI.Input.GestureSettings.RightTap | Windows.UI.Input.GestureSettings.Drag;
 
             ocrEngine = new OcrEngine(OcrLanguage.English);
-            this.NavigationCacheMode = NavigationCacheMode.Required;
+            //this.NavigationCacheMode = NavigationCacheMode.Required;
 
         }
 

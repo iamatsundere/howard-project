@@ -261,30 +261,30 @@
         private async void UpdatePreviewImage()
         {
             Debug.WriteLine("UpdatePreviewImage");
-            //double sourceImageWidthScale = this.imageCanvas.Width / this.sourceImagePixelWidth;
-            //double sourceImageHeightScale = this.imageCanvas.Height / this.sourceImagePixelHeight;
+            double sourceImageWidthScale = this.imageCanvas.Width / this.sourceImagePixelWidth;
+            double sourceImageHeightScale = this.imageCanvas.Height / this.sourceImagePixelHeight;
 
-            //Size previewImageSize = new Size(
-            //    this.selectedRegion.SelectedRect.Width / sourceImageWidthScale,
-            //    this.selectedRegion.SelectedRect.Height / sourceImageHeightScale);
+            Size previewImageSize = new Size(
+                this.selectedRegion.SelectedRect.Width / sourceImageWidthScale,
+                this.selectedRegion.SelectedRect.Height / sourceImageHeightScale);
 
-            //double previewImageScale = 1;
+            double previewImageScale = 1;
 
-            //if (previewImageSize.Width <= this.imageCanvas.Width &&
-            //    previewImageSize.Height <= this.imageCanvas.Height)
-            //{
-            //}
-            //else
-            //{
-            //    previewImageScale = Math.Min(this.imageCanvas.Width / previewImageSize.Width,
-            //        this.imageCanvas.Height / previewImageSize.Height);
-            //}
+            if (previewImageSize.Width <= this.imageCanvas.Width &&
+                previewImageSize.Height <= this.imageCanvas.Height)
+            {
+            }
+            else
+            {
+                previewImageScale = Math.Min(this.imageCanvas.Width / previewImageSize.Width,
+                    this.imageCanvas.Height / previewImageSize.Height);
+            }
 
-            //this.CroppedImage = await CropBitmap.GetCroppedBitmapAsync(
-            //       this.sourceImageFile,
-            //       new Point(this.selectedRegion.SelectedRect.X / sourceImageWidthScale, this.selectedRegion.SelectedRect.Y / sourceImageHeightScale),
-            //       previewImageSize,
-            //       previewImageScale);
+            this.CroppedImage = await CropBitmap.GetCroppedBitmapAsync(
+                   this.sourceImageFile,
+                   new Point(this.selectedRegion.SelectedRect.X / sourceImageWidthScale, this.selectedRegion.SelectedRect.Y / sourceImageHeightScale),
+                   previewImageSize,
+                   previewImageScale);
         }
 
         /// <summary>
@@ -345,10 +345,16 @@
 
                 this.imageCanvas.Height = e.NewSize.Height;
                 this.imageCanvas.Width = e.NewSize.Width;
-                this.selectedRegion.OuterRect = new Rect(0, 0, e.NewSize.Width, e.NewSize.Height);
+                this.selectedRegion.OuterRect = new Rect(0, 0, sizeWidth, sizeHeight);
+                //this.selectedRegion.OuterRect = new Rect((e.NewSize.Width - sizeWidth) / 2, (e.NewSize.Height - sizeHeight) / 2,
+                //    sizeWidth, sizeHeight);
 
                 // Always Reset Selected Region
-                this.selectedRegion.ResetCorner(0, 0, e.NewSize.Width, e.NewSize.Height);
+                double cropX = (e.NewSize.Width - sizeWidth) / 2;
+                double cropY = (e.NewSize.Height - sizeHeight) / 2;
+                Debug.WriteLine("cropX " + cropX + " cropY " + cropY);
+                this.selectedRegion.ResetCorner(cropX, cropY, cropX + sizeWidth, cropY + sizeHeight);
+                //this.selectedRegion.ResetCorner(0, 0, 0, 0);
 
                 this.UpdatePreviewImage();
             }
