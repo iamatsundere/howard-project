@@ -111,7 +111,6 @@ namespace BTLXLA
             return resBytes;
         }
 
-
         public static double[,] ConvolutionFilter(WriteableBitmap bmpInput, int[,] maskByte, int bias)
         {
             double[,] arrRes = new double[bmpInput.PixelHeight, bmpInput.PixelWidth];
@@ -143,8 +142,7 @@ namespace BTLXLA
             }
             return arrRes;
         }
-
-        public static double[,] ConvolutionFilter(double[,] bmpInput, int[,] maskByte, int bias)
+        public static double[,] ConvolutionFilter(double[,] bmpInput, int[,] maskByte, double bias)
         {
             double[,] arrRes = new double[bmpInput.GetLength(0), bmpInput.GetLength(1)];
             int intHeight = bmpInput.GetLength(0);
@@ -170,7 +168,37 @@ namespace BTLXLA
                                 sum = sum + (int)(bmpInput[y - (y_mask - 1), x - (x_mask - 1)] * maskByte[y_mask, x_mask]);
                             }
                     }
-                    arrRes[y, x] = sum / (double)(bias);
+                    arrRes[y, x] = sum * (bias);
+                }
+            }
+            return arrRes;
+        }
+        public static double[,] ConvolutionFilter(double[,] bmpInput, double[,] maskByte, double bias)
+        {
+            double[,] arrRes = new double[bmpInput.GetLength(0), bmpInput.GetLength(1)];
+            int intHeight = bmpInput.GetLength(0);
+            int intWidth = bmpInput.GetLength(1);
+
+
+            for (int y = 1; y < intHeight - 1; y++)
+            {
+                for (int x = 1; x < intWidth - 1; x++)
+                {
+                    int sum = 0;
+                    for (int y_mask = 0; y_mask < maskByte.GetLength(1); y_mask++)
+                    {
+                        for (int x_mask = 0; x_mask < maskByte.GetLength(0); x_mask++)
+                            if ((x - (x_mask - 1)) < 0 || (x - (x_mask - 1)) >= intWidth
+                                || (y - (y_mask - 1)) < 0 || (y - (y_mask - 1) >= intHeight))
+                            {
+                                sum += 0;
+                            }
+                            else
+                            {
+                                sum = sum + (int)(bmpInput[y - (y_mask - 1), x - (x_mask - 1)] * maskByte[y_mask, x_mask]);
+                            }
+                    }
+                    arrRes[y, x] = sum * bias;
                 }
             }
             return arrRes;
@@ -199,8 +227,7 @@ namespace BTLXLA
             int intHeight = bmpInput.GetLength(0);
             int intWidth = bmpInput.GetLength(1);
             double[,] bitmapOutput = new double[intHeight, intWidth];
-            //lock bits to memory, disable bit A just execute the RGB image
-            //turn image to an array of bits (1 dimension) start with its first address in memory
+
             for (int i = 0; i <= intHeight - 1; i++)
             {
                 for (int j = 0; j <= intWidth - 1; j++)
@@ -217,10 +244,10 @@ namespace BTLXLA
             return bitmapOutput;
         }
 
-
         const string fMax = "MAX";
         const string fMed = "MED";
         const string fMin = "MIN";
+
         public static double FindByte(double[] arr, string type)
         {
             double[] arrI = new double[9];
@@ -410,47 +437,43 @@ namespace BTLXLA
         #endregion
 
 
-        //public static WriteableBitmap MakeGrayscale3(WriteableBitmap original)
-        //{
-        //    try
-        //    {
-        //        //create a blank bitmap the same size as original
-        //        WriteableBitmap newBitmap = new WriteableBitmap(original.PixelWidth, original.PixelHeight);
+        #region BASE FUNCTIONS
 
-        //        //get a graphics object from the new image
-        //        Graphics g = Graphics.FromImage(newBitmap);
+        public void Gradient(WriteableBitmap bmpInput)
+        {
+            //int intHeight = bmpInput.PixelHeight;
+            //int intWidth = bmpInput.PixelWidth;
+            //byte[,] bytData = new byte[intHeight, intWidth];
+            //bytData = GetMatrixData(bmpInput);
 
-        //        //create the grayscale ColorMatrix
-        //        ColorMatrix colorMatrix = new ColorMatrix(
-        //           new float[][]
-        //           {
-        // new float[] {.3f, .3f, .3f, 0, 0},
-        // new float[] {.59f, .59f, .59f, 0, 0},
-        // new float[] {.11f, .11f, .11f, 0, 0},
-        // new float[] {0, 0, 0, 1, 0},
-        // new float[] {0, 0, 0, 0, 1}
-        //           });
-
-        //        //create some image attributes
-        //        ImageAttributes attributes = new ImageAttributes();
-
-        //        //set the color matrix attribute
-        //        attributes.SetColorMatrix(colorMatrix);
-
-        //        //draw the original image on the new image
-        //        //using the grayscale color matrix
-        //        g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height),
-        //           0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
-
-        //        //dispose the Graphics object
-        //        g.Dispose();
-        //        return newBitmap;
-        //    }
-        //    catch
-        //    {
-        //        return null;
-        //    }
-        //}
+            //Rectangle rtg = new Rectangle(0, 0, bmpInput.PixelWidth, bmpInput.PixelHeight);
+            //BitmapData datInput = bmpInput.LockBits(rtg, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            //IntPtr ptrScan0 = datInput.Scan0;
+            //int intStride = datInput.Stride;
+            //int intSpace = intStride - intWidth * 3;
+            //unsafe
+            //{
+            //    byte* ptr = (byte*)ptrScan0;
+            //    int[,] intMask1 = new int[3, 3] { { 0, -1, 0 }, { -1, 4, -1 }, { 0, -1, 0 } };
+            //    int intValue;
+            //    for (int i = 0; i <= intHeight - 1; i++)
+            //    {
+            //        for (int j = 0; j <= intWidth - 1; j++)
+            //        {
+            //            if ((i > 0) && (i < intHeight - 1) && (j > 0) && (j < intWidth - 1))
+            //            {
+            //                intValue = (PointCalc(bytData, intMask1, i, j)); //+ PointCalc(bytData, intMask2, i, j));
+            //                if (intValue > 255) intValue = 255;
+            //                if (intValue < 0) intValue = 0;
+            //                ptr[0] = ptr[1] = ptr[2] = (byte)intValue;
+            //            }
+            //            ptr += 3;
+            //        }
+            //        ptr += intSpace;
+            //    }
+            //}
+            //bmpInput.UnlockBits(datInput);
+        }
 
         public static void NegativeT(WriteableBitmap bmpInput)
         {
@@ -976,6 +999,7 @@ namespace BTLXLA
 
             //bmpDoituong.UnlockBits(bmpData);
         }
+        #endregion
 
         #region Predefine for Fourier Transform
         private const int maxBits = 14;
@@ -1189,44 +1213,6 @@ namespace BTLXLA
         #endregion
 
 
-
-        public void Gradient(WriteableBitmap bmpInput)
-        {
-            //int intHeight = bmpInput.PixelHeight;
-            //int intWidth = bmpInput.PixelWidth;
-            //byte[,] bytData = new byte[intHeight, intWidth];
-            //bytData = GetMatrixData(bmpInput);
-
-            //Rectangle rtg = new Rectangle(0, 0, bmpInput.PixelWidth, bmpInput.PixelHeight);
-            //BitmapData datInput = bmpInput.LockBits(rtg, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-            //IntPtr ptrScan0 = datInput.Scan0;
-            //int intStride = datInput.Stride;
-            //int intSpace = intStride - intWidth * 3;
-            //unsafe
-            //{
-            //    byte* ptr = (byte*)ptrScan0;
-            //    int[,] intMask1 = new int[3, 3] { { 0, -1, 0 }, { -1, 4, -1 }, { 0, -1, 0 } };
-            //    int intValue;
-            //    for (int i = 0; i <= intHeight - 1; i++)
-            //    {
-            //        for (int j = 0; j <= intWidth - 1; j++)
-            //        {
-            //            if ((i > 0) && (i < intHeight - 1) && (j > 0) && (j < intWidth - 1))
-            //            {
-            //                intValue = (PointCalc(bytData, intMask1, i, j)); //+ PointCalc(bytData, intMask2, i, j));
-            //                if (intValue > 255) intValue = 255;
-            //                if (intValue < 0) intValue = 0;
-            //                ptr[0] = ptr[1] = ptr[2] = (byte)intValue;
-            //            }
-            //            ptr += 3;
-            //        }
-            //        ptr += intSpace;
-            //    }
-            //}
-            //bmpInput.UnlockBits(datInput);
-        }
-
-
         static private int PointCalc(byte[,] bytImage, int[,] intMask, int X, int Y)
         {
             return (Math.Abs(intMask[0, 0] * bytImage[X - 1, Y - 1]
@@ -1335,6 +1321,97 @@ namespace BTLXLA
                         count++;
                     }
             return (double)sum / count;
+        }
+        #endregion
+
+        #region HISTOGRAM EQUALIZATION
+        public static double[,] HistogranEqualization(double[,] imgArr)
+        {
+            Debug.WriteLine(1);
+            int imgH = imgArr.GetLength(0);
+            int imgW = imgArr.GetLength(1);
+            double[,] arrRes = new double[imgH, imgW];
+
+            Debug.WriteLine(2);
+            int[] arrBit = new int[256];
+            for (int i = 0; i < imgH; i++)
+                for (int j = 0; j < imgW; j++)
+                {
+                    int x = (int)imgArr[i, j];
+                    if (x < 0)
+                        x = 0;
+                    if (x > 255)
+                        x = 255;
+                    arrBit[x] += 1;
+                }
+
+            Debug.WriteLine(3);
+            int[] arrSBit = new int[256];
+            arrSBit[0] = arrBit[0];
+            for (int i = 1; i < 256; i++)
+            {
+                arrSBit[i] = arrSBit[i - 1] + arrBit[i];
+            }
+            for (int i = 1; i < 256; i++)
+            {
+                arrSBit[i] = (arrSBit[i] * 255) / (imgW * imgH);
+            }
+
+            Debug.WriteLine(4);
+            for (int i = 0; i < imgH; i++)
+                for (int j = 0; j < imgW; j++)
+                {
+                    int idx = (int)imgArr[i, j];
+                    if (idx < 0)
+                        idx = 0;
+                    if (idx > 255)
+                        idx = 255;
+                    arrRes[i, j] = arrSBit[idx];
+                }
+
+            Debug.WriteLine(5);
+            return arrRes;
+        }
+        #endregion
+
+        #region GAUSSIAN SMOOTHING
+        private static double GenGaussItem(double omega, int x, int y)
+        {
+            try
+            {
+                double v1 = (1.0) / (2 * Math.PI * Math.Pow(omega, 2));
+                double v2 = -(x * x + y * y) / (2 * Math.Pow(omega, 2));
+                double v3 = Math.Pow(Math.E, v2);
+                return v1 * v3;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return 0.0;
+            }
+        }
+
+        /// <summary>
+        /// GaussSmoothing
+        /// </summary>
+        /// <param name="arrImage">input matrix</param>
+        /// <param name="mGSize">matrix size, even number</param>
+        /// <param name="sigma">sigma value of Gauss func</param>
+        /// <returns></returns>
+        public static double[,] GaussSmoothing(double[,] arrImage, int mGSize, double sigma)
+        {
+            double[,] matrixG = new double[mGSize, mGSize];
+
+            for (int i = 0; i < mGSize; i++)
+                for (int j = 0; j < mGSize; j++)
+                {
+                    int x = Math.Abs(i - (mGSize / 2));
+                    int y = Math.Abs(j - (mGSize / 2));
+                    matrixG[i, j] = GenGaussItem(sigma, x, y);
+                }
+
+            arrImage = ConvolutionFilter(arrImage, matrixG, 1.0);
+            return arrImage;
         }
         #endregion
     }

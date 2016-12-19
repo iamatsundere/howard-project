@@ -41,12 +41,14 @@ namespace BTLXLA
     {
         MediaCapture captureManager;
         private CoreApplicationView view;
+        private int stepN = 1;
+        private int stepS = 1;
+
 
         /// <summary>
         /// 0=front 1=back
         /// </summary>
         private int CamId = 1;
-        // OCR engine instance used to extract text from images.
         private OcrEngine ocrEngine;
 
         GestureRecognizer gestureRecognizer = new GestureRecognizer();
@@ -55,18 +57,12 @@ namespace BTLXLA
         {
             this.InitializeComponent();
 
-            this.Loaded += MainPage_Loaded;
-
             view = CoreApplication.GetCurrentView();
             this.gestureRecognizer.GestureSettings = Windows.UI.Input.GestureSettings.Tap | Windows.UI.Input.GestureSettings.DoubleTap | Windows.UI.Input.GestureSettings.RightTap | Windows.UI.Input.GestureSettings.Drag;
 
             ocrEngine = new OcrEngine(OcrLanguage.English);
-            this.NavigationCacheMode = NavigationCacheMode.Enabled;
+            this.NavigationCacheMode = NavigationCacheMode.Required;
 
-        }
-
-        private void MainPage_Loaded(object sender, RoutedEventArgs e)
-        {
         }
 
         /// <summary>
@@ -86,10 +82,10 @@ namespace BTLXLA
         {
             try
             {
-                //rectCrop.Visibility = Visibility.Collapsed;
+                rectCrop.Visibility = Visibility.Collapsed;
 
-                StorageFile file = await Converter.WriteableBitmapToStorageFile(new WriteableBitmap(384, 384), Converter.FileFormat.Jpeg);
-                await rectCrop.LoadImage(file);
+                //StorageFile file = await Converter.WriteableBitmapToStorageFile(new WriteableBitmap(384, 384), Converter.FileFormat.Jpeg);
+                //await rectCrop.LoadImage(file);
 
                 if (captureManager != null)
                 {
@@ -166,6 +162,7 @@ namespace BTLXLA
         BitmapImage bmpImage;
         double[,] matrixImage;
 
+        #region APP MAIN FUNCTIONS
         private async void btnCapture_Tapped(object sender, TappedRoutedEventArgs e)
         {
             Debug.WriteLine(1);
@@ -247,31 +244,36 @@ namespace BTLXLA
                 btnCapture.IsEnabled = false;
                 string extractedText = "";
 
-                //From stream to WriteableBitmap
-                wb = await StorageFileToWriteableBitmap(file);
-
-                int fixedSize = (wb.PixelHeight < wb.PixelWidth) ? wb.PixelWidth : wb.PixelHeight;
-
-                //// Get the size of the image when it is displayed on the phone
-                double displayedWidth = imgCapped.ActualWidth;
-                double displayedHeight = imgCapped.ActualHeight;
-
-                double fixedDisplay = (displayedHeight < displayedWidth) ? displayedWidth : displayedHeight;
-
-                double ratio = fixedSize / fixedDisplay;
-
                 wb = rectCrop.CroppedImage;
 
-                //PREPROCESSING
+                //PREPROCESSING PROCEDURES
+
                 byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
                 matrixImage = Converter.ByteArrayToMatrix(arrImg, wb.PixelWidth, 4);
-                matrixImage = ImageClass.ConvolutionFilter(matrixImage, ImageClass.maskSharp1, 1);
+                //SHARPENNING
+                matrixImage = ImageClass.ConvolutionFilter(matrixImage, ImageClass.maskSharp1, 1.0);
 
                 //THRESHOLDING
                 int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
                 matrixImage = ImageClass.OtsuProcessed(matrixImage, otsuT);
-                arrImg = Converter.MatrixToByteArray(matrixImage);
 
+                //GAUSSIAN SMOOTHING
+                Debug.WriteLine("stepS " + stepS);
+                Debug.WriteLine("stepN " + stepN);
+                matrixImage = ImageClass.GaussSmoothing(matrixImage, stepN * 2 + 1, stepS * 0.5);
+                stepN += 1;
+                if (stepN == 5)
+                {
+                    stepS += 1;
+                    stepN = 1;
+                }
+
+                //HE - I am not sure that method can improve the quality of image
+                matrixImage = ImageClass.HistogranEqualization(matrixImage);
+
+                //END OF THESE PROCEDURES
+
+                arrImg = Converter.MatrixToByteArray(matrixImage);
                 wb = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
 
                 {
@@ -370,6 +372,8 @@ namespace BTLXLA
             view.Activated += View_Activated;
         }
 
+        #endregion
+
         private async void View_Activated(CoreApplicationView sender, IActivatedEventArgs args1)
         {
             FileOpenPickerContinuationEventArgs args = args1 as FileOpenPickerContinuationEventArgs;
@@ -380,6 +384,7 @@ namespace BTLXLA
 
                 view.Activated -= View_Activated;
                 file = args.Files[0];
+                rectCrop.Visibility = Visibility.Visible;
                 await rectCrop.LoadImage(file);
 
                 ImageProperties properties = await file.Properties.GetImagePropertiesAsync();
@@ -388,55 +393,6 @@ namespace BTLXLA
             }
         }
 
-        public async Task<WriteableBitmap> StorageFileToWriteableBitmap(StorageFile file)
-        {
-            WriteableBitmap wb = null;
-            ImageProperties properties = await file.Properties.GetImagePropertiesAsync();
-            wb = new WriteableBitmap((int)properties.Width, (int)properties.Height);
-            wb.SetSource((await file.OpenReadAsync()));
-            return wb;
-        }
-
-        private async Task<WriteableBitmap> ResizeWritableBitmap(WriteableBitmap baseWriteBitmap, uint width, uint height)
-        {
-            // Get the pixel buffer of the writable bitmap in bytes
-            Stream stream = baseWriteBitmap.PixelBuffer.AsStream();
-            byte[] pixels = new byte[(uint)stream.Length];
-            await stream.ReadAsync(pixels, 0, pixels.Length);
-            //Encoding the data of the PixelBuffer we have from the writable bitmap
-            var inMemoryRandomStream = new InMemoryRandomAccessStream();
-            var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, inMemoryRandomStream);
-            encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Ignore, width, height, 96, 96, pixels);
-            await encoder.FlushAsync();
-            // At this point we have an encoded image in inMemoryRandomStream
-            // We apply the transform and decode
-            var transform = new BitmapTransform
-            {
-                ScaledWidth = width,
-                ScaledHeight = height
-            };
-            inMemoryRandomStream.Seek(0);
-            var decoder = await BitmapDecoder.CreateAsync(inMemoryRandomStream);
-            var pixelData = await decoder.GetPixelDataAsync(
-                            BitmapPixelFormat.Rgba8,
-                            BitmapAlphaMode.Straight,
-                            transform,
-                            ExifOrientationMode.IgnoreExifOrientation,
-                            ColorManagementMode.DoNotColorManage);
-            //An array containing the decoded image data
-            var sourceDecodedPixels = pixelData.DetachPixelData();
-            // Approach 1 : Encoding the image buffer again:
-            //Encoding data
-            var inMemoryRandomStream2 = new InMemoryRandomAccessStream();
-            var encoder2 = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, inMemoryRandomStream2);
-            encoder2.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Ignore, width, height, 96, 96, sourceDecodedPixels);
-            await encoder2.FlushAsync();
-            inMemoryRandomStream2.Seek(0);
-            // finally the resized writablebitmap
-            var bitmap = new WriteableBitmap((int)width, (int)height);
-            await bitmap.SetSourceAsync(inMemoryRandomStream2);
-            return bitmap;
-        }
 
         #region CAMERA HELPERS
         private int flashMode = 0;

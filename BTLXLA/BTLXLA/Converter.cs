@@ -159,11 +159,12 @@ namespace BTLXLA
             {
                 BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoderGuid, stream);
                 Stream pixelStream = WB.PixelBuffer.AsStream();
+                //byte[] pixels = new byte[pixelStream.Length];
                 byte[] pixels = new byte[pixelStream.Length];
-                Debug.WriteLine("pixels " + pixels.Length);
-                Debug.WriteLine(pixels);
+                for (int i = 0; i < pixels.Length; i++)
+                    pixels[i] = 255;
                 await pixelStream.ReadAsync(pixels, 0, pixels.Length);
-                encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore,
+                encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
                           (uint)WB.PixelWidth,
                           (uint)WB.PixelHeight,
                           96.0,
@@ -218,6 +219,48 @@ namespace BTLXLA
                     bytes[curren_pos + 3] = 255;
                 }
             return bytes;
+        }
+        
+
+        private async Task<WriteableBitmap> ResizeWritableBitmap(WriteableBitmap baseWriteBitmap, uint width, uint height)
+        {
+            // Get the pixel buffer of the writable bitmap in bytes
+            Stream stream = baseWriteBitmap.PixelBuffer.AsStream();
+            byte[] pixels = new byte[(uint)stream.Length];
+            await stream.ReadAsync(pixels, 0, pixels.Length);
+            //Encoding the data of the PixelBuffer we have from the writable bitmap
+            var inMemoryRandomStream = new InMemoryRandomAccessStream();
+            var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, inMemoryRandomStream);
+            encoder.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Ignore, width, height, 96, 96, pixels);
+            await encoder.FlushAsync();
+            // At this point we have an encoded image in inMemoryRandomStream
+            // We apply the transform and decode
+            var transform = new BitmapTransform
+            {
+                ScaledWidth = width,
+                ScaledHeight = height
+            };
+            inMemoryRandomStream.Seek(0);
+            var decoder = await BitmapDecoder.CreateAsync(inMemoryRandomStream);
+            var pixelData = await decoder.GetPixelDataAsync(
+                            BitmapPixelFormat.Rgba8,
+                            BitmapAlphaMode.Straight,
+                            transform,
+                            ExifOrientationMode.IgnoreExifOrientation,
+                            ColorManagementMode.DoNotColorManage);
+            //An array containing the decoded image data
+            var sourceDecodedPixels = pixelData.DetachPixelData();
+            // Approach 1 : Encoding the image buffer again:
+            //Encoding data
+            var inMemoryRandomStream2 = new InMemoryRandomAccessStream();
+            var encoder2 = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, inMemoryRandomStream2);
+            encoder2.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Ignore, width, height, 96, 96, sourceDecodedPixels);
+            await encoder2.FlushAsync();
+            inMemoryRandomStream2.Seek(0);
+            // finally the resized writablebitmap
+            var bitmap = new WriteableBitmap((int)width, (int)height);
+            await bitmap.SetSourceAsync(inMemoryRandomStream2);
+            return bitmap;
         }
 
     }

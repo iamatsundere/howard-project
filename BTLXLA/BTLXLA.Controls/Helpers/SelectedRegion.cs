@@ -175,12 +175,23 @@ namespace BTLXLA.Controls.Helpers
                 //Debug.WriteLine("bottomRightCornerCanvasLeft " + BottomRightCornerCanvasLeft);
                 //Debug.WriteLine("bottomRightCornerCanvasTop " + BottomRightCornerCanvasTop);
 
-                if (BottomRightCornerCanvasLeft == 0 || BottomRightCornerCanvasTop == 0)
+                if (BottomRightCornerCanvasLeft - TopLeftCornerCanvasLeft <= 0)
                 {
-                    TopLeftCornerCanvasTop = 311;
                     BottomRightCornerCanvasLeft = TopLeftCornerCanvasLeft + 300;
-                    BottomRightCornerCanvasTop = TopLeftCornerCanvasTop + 128;
                 }
+
+                if (BottomRightCornerCanvasTop - topLeftCornerCanvasTop <= 0)
+                {
+                    if (TopLeftCornerCanvasTop == 0)
+                        TopLeftCornerCanvasTop = 311;
+                    BottomRightCornerCanvasTop = topLeftCornerCanvasTop + 128;
+                }
+                //if (BottomRightCornerCanvasLeft == 0 || BottomRightCornerCanvasTop == 0)
+                //{
+                //    TopLeftCornerCanvasTop = 311;
+                //    BottomRightCornerCanvasLeft = TopLeftCornerCanvasLeft + 300;
+                //    BottomRightCornerCanvasTop = TopLeftCornerCanvasTop + 128;
+                //}
 
                 SelectedRect = new Rect(
                     TopLeftCornerCanvasLeft,
