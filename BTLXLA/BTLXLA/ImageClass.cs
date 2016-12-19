@@ -224,6 +224,7 @@ namespace BTLXLA
 
         public static double[,] NoiseFilter(double[,] bmpInput, string type)
         {
+            Debug.WriteLine("NoiseFilter");
             int intHeight = bmpInput.GetLength(0);
             int intWidth = bmpInput.GetLength(1);
             double[,] bitmapOutput = new double[intHeight, intWidth];
@@ -250,14 +251,23 @@ namespace BTLXLA
 
         public static double FindByte(double[] arr, string type)
         {
-            double[] arrI = new double[9];
-            for (int i = 0; i < 9; i++)
+            double[] arrI = new double[arr.Length];
+            for (int i = 0; i < arr.Length; i++)
                 arrI[i] = arr[i];
             Array.Sort(arrI);
             if (type.CompareTo(fMax) == 0)
-                return (byte)arrI[8];
+                return (byte)arrI[arr.Length - 1];
             if (type.CompareTo(fMed) == 0)
-                return (byte)arrI[5];
+            {
+                if (arr.Length % 2 == 0)
+                {
+                    return (byte)(arrI[arr.Length / 2] + arrI[arr.Length / 2 - 1]) / 2;
+                }
+                else
+                {
+                    return (byte)arrI[arr.Length / 2];
+                }
+            }
             if (type.CompareTo(fMin) == 0)
                 return (byte)arrI[0];
             return 0;

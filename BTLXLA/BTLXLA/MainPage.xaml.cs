@@ -74,7 +74,7 @@ namespace BTLXLA
         {
             if (DisplayInformation.AutoRotationPreferences != DisplayOrientations.Portrait)
                 DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
-            //this.InitCam(Windows.Devices.Enumeration.Panel.Back);
+            this.InitCam(Windows.Devices.Enumeration.Panel.Back);
         }
 
 
@@ -257,15 +257,12 @@ namespace BTLXLA
                 Debug.WriteLine("stepS " + stepS);
                 Debug.WriteLine("stepN " + stepN);
                 matrixImage = ImageClass.GaussSmoothing(matrixImage, stepN * 2 + 1, stepS * 0.5);
-                stepN += 1;
-                if (stepN == 5)
-                {
-                    stepS += 1;
-                    stepN = 1;
-                }
 
-                //HE - I am not sure that method can improve the quality of image
-                matrixImage = ImageClass.HistogranEqualization(matrixImage);
+                ////This is stupid, too
+                //matrixImage = ImageClass.NoiseFilter(matrixImage, "MAX");
+
+                ////HE - I am not sure that method can improve the quality of image
+                //matrixImage = ImageClass.HistogranEqualization(matrixImage);
 
                 //THRESHOLDING
                 int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
