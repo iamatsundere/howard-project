@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Threading.Tasks;
     using Windows.Foundation;
     using Windows.Graphics.Imaging;
@@ -91,8 +92,20 @@
         /// </summary>
         /// <param name="imageFile">The image file.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">imageFile;Image is too small.</exception>
+        public void InitCropper()
+        {
+            this.sourceImage.Source = null;
+            this.CroppedImage = null;
+        }
+
+        /// <summary>
+        /// Loads the image.
+        /// </summary>
+        /// <param name="imageFile">The image file.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">imageFile;Image is too small.</exception>
         public async Task LoadImage(StorageFile imageFile)
         {
+            //Debug.WriteLine("LoadImage");
             using (IRandomAccessStream fileStream = await imageFile.OpenAsync(Windows.Storage.FileAccessMode.Read))
             {
                 this.sourceImageFile = imageFile;
@@ -120,6 +133,7 @@
                 }
                 else
                 {
+
                 }
 
                 if (sourceImageScale == 0)
@@ -141,11 +155,63 @@
             }
         }
 
+
+
+        /// <summary>
+        /// Loads the image.
+        /// </summary>
+        /// <param name="imageFile">The image file.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">imageFile;Image is too small.</exception>
+        public void LoadImageBitmap(WriteableBitmap wb)
+        {
+            //Debug.WriteLine("LoadImage");
+            this.sourceImagePixelHeight = (uint)wb.PixelHeight;
+            this.sourceImagePixelWidth = (uint)wb.PixelWidth;
+
+            if (this.sourceImagePixelHeight < 2 * CornerSize ||
+                this.sourceImagePixelWidth < 2 * CornerSize)
+            {
+                // Image too small.
+                throw new ArgumentOutOfRangeException("imageFile", "Image is too small.");
+            }
+            else
+            {
+                double sourceImageScale = 1;
+
+                if (this.sourceImagePixelHeight > this.layoutRoot.ActualHeight ||
+                    this.sourceImagePixelWidth > this.layoutRoot.ActualWidth)
+                {
+                    sourceImageScale = Math.Min(this.layoutRoot.ActualWidth / this.sourceImagePixelWidth,
+                         this.layoutRoot.ActualHeight / this.sourceImagePixelHeight);
+                }
+                else
+                {
+
+                }
+
+                if (sourceImageScale == 0)
+                {
+                    // Control is invisible, unable to scale the source image.
+                    return;
+
+                    // This would be a bit harsh:
+                    // throw new InvalidOperationException("ImageCropper is not visible.");
+                }
+
+                //Debug.WriteLine("sourceImageScale " + sourceImageScale);
+
+                this.sourceImage.Source = wb;
+
+                this.CroppedImage = null;
+            }
+        }
+
         /// <summary>
         /// Invoked whenever application code or internal processes (such as a rebuilding layout pass) call ApplyTemplate. In simplest terms, this means the method is called just before a UI element displays in your app. Override this method to influence the default post-template logic of a class.
         /// </summary>
         protected override void OnApplyTemplate()
         {
+            //Debug.WriteLine("OnApplyTemplate");
             // Code might use some null reference checks here.
 
             this.layoutRoot = this.GetTemplateChild(LayoutRootPartName) as Grid;
@@ -178,6 +244,7 @@
 
         private void AddCornerEvents(Control corner)
         {
+            //Debug.WriteLine("AddCornerEvents");
             corner.PointerPressed += Corner_PointerPressed;
             corner.PointerMoved += Corner_PointerMoved;
             corner.PointerReleased += Corner_PointerReleased;
@@ -191,6 +258,7 @@
         /// </summary>
         private void Corner_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            //Debug.WriteLine("Corner_PointerPressed");
             (sender as UIElement).CapturePointer(e.Pointer);
 
             Windows.UI.Input.PointerPoint pt = e.GetCurrentPoint(this);
@@ -206,6 +274,7 @@
         /// </summary>
         private void Corner_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
+            //Debug.WriteLine("Corner_PointerMoved");
             Windows.UI.Input.PointerPoint pt = e.GetCurrentPoint(this);
             uint ptrId = pt.PointerId;
 
@@ -232,6 +301,7 @@
         /// </summary>
         private void Corner_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
+            //Debug.WriteLine("Corner_PointerReleased");
             uint ptrId = e.GetCurrentPoint(this).PointerId;
             if (this.pointerPositionHistory.ContainsKey(ptrId))
             {
@@ -249,6 +319,7 @@
         /// </summary>
         private async void UpdatePreviewImage()
         {
+            //Debug.WriteLine("UpdatePreviewImage");
             double sourceImageWidthScale = this.imageCanvas.Width / this.sourceImagePixelWidth;
             double sourceImageHeightScale = this.imageCanvas.Height / this.sourceImagePixelHeight;
 
@@ -282,6 +353,7 @@
         /// </summary>
         private void SelectRegion_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
         {
+            //Debug.WriteLine("SelectRegion_ManipulationDelta");
             this.selectedRegion.UpdateSelectedRect(e.Delta.Scale, e.Delta.Translation.X, e.Delta.Translation.Y);
             e.Handled = true;
         }
@@ -304,6 +376,7 @@
         /// <param name="e"></param>
         private void SourceImage_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            //Debug.WriteLine("SourceImage_SizeChanged");
             if (e.NewSize.IsEmpty || double.IsNaN(e.NewSize.Height) || e.NewSize.Height <= 0)
             {
                 this.imageCanvas.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
@@ -314,12 +387,33 @@
             {
                 this.imageCanvas.Visibility = Windows.UI.Xaml.Visibility.Visible;
 
+                //OLD CODE
+                //this.imageCanvas.Height = e.NewSize.Height;
+                //this.imageCanvas.Width = e.NewSize.Width;
+                //this.selectedRegion.OuterRect = new Rect(0, 0, e.NewSize.Width, e.NewSize.Height);
+
+                //// Always Reset Selected Region
+                //this.selectedRegion.ResetCorner(0, 0, e.NewSize.Width, e.NewSize.Height);
+
+                //NEW CODE
+                uint rootH = (uint)this.layoutRoot.ActualHeight;
+                uint rootW = (uint)this.layoutRoot.ActualWidth;
+
+                uint sizeWidth = 300;
+                uint sizeHeight = 128;
+
                 this.imageCanvas.Height = e.NewSize.Height;
                 this.imageCanvas.Width = e.NewSize.Width;
                 this.selectedRegion.OuterRect = new Rect(0, 0, e.NewSize.Width, e.NewSize.Height);
+                //this.selectedRegion.OuterRect = new Rect((e.NewSize.Width - sizeWidth) / 2, (e.NewSize.Height - sizeHeight) / 2,
+                //    sizeWidth, sizeHeight);
 
                 // Always Reset Selected Region
-                this.selectedRegion.ResetCorner(0, 0, e.NewSize.Width, e.NewSize.Height);
+                double cropX = (e.NewSize.Width - sizeWidth) / 2;
+                double cropY = (e.NewSize.Height - sizeHeight) / 2;
+                //Debug.WriteLine("cropX " + cropX + " cropY " + cropY);
+                this.selectedRegion.ResetCorner(cropX, cropY, cropX + sizeWidth, cropY + sizeHeight);
+                //this.selectedRegion.ResetCorner(0, 0, 0, 0);
 
                 this.UpdatePreviewImage();
             }

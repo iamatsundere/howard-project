@@ -134,7 +134,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="BTLXLA.Controls">
+    <Reference Include="BTLXLA.Controls, Version=1.0.0.0, Culture=neutral, processorArchitecture=ARM">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\BTLXLA.Controls\bin\ARM\Debug\BTLXLA.Controls.dll</HintPath>
     </Reference>
     <Reference Include="Coding4Fun.Toolkit, Version=2.0.8.0, Culture=neutral, PublicKeyToken=c5fd7b72b1a17ce4, processorArchitecture=MSIL">
