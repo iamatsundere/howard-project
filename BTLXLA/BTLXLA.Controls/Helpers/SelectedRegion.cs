@@ -170,10 +170,10 @@ namespace BTLXLA.Controls.Helpers
                 propertyName == BottomRightCornerCanvasLeftPropertyName ||
                 propertyName == BottomRightCornerCanvasTopPropertyName)
             {
-                Debug.WriteLine("topLeftCornerCanvasLeft " + TopLeftCornerCanvasLeft);
-                Debug.WriteLine("topLeftCornerCanvasTop " + TopLeftCornerCanvasTop);
-                Debug.WriteLine("bottomRightCornerCanvasLeft " + BottomRightCornerCanvasLeft);
-                Debug.WriteLine("bottomRightCornerCanvasTop " + BottomRightCornerCanvasTop);
+                //Debug.WriteLine("topLeftCornerCanvasLeft " + TopLeftCornerCanvasLeft);
+                //Debug.WriteLine("topLeftCornerCanvasTop " + TopLeftCornerCanvasTop);
+                //Debug.WriteLine("bottomRightCornerCanvasLeft " + BottomRightCornerCanvasLeft);
+                //Debug.WriteLine("bottomRightCornerCanvasTop " + BottomRightCornerCanvasTop);
 
                 if (BottomRightCornerCanvasLeft == 0 || BottomRightCornerCanvasTop == 0)
                 {
