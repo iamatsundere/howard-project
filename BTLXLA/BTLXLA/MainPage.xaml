@@ -47,8 +47,7 @@
             </Canvas>
         </Grid>-->
 
-        <cc:ImageCropper x:Name="rectCrop"
-                         Visibility="Collapsed"/>
+        <cc:ImageCropper x:Name="rectCrop"/>
 
         <Grid Height="128"
               VerticalAlignment="Bottom">

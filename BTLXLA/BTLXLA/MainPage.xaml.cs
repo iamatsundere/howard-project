@@ -88,6 +88,10 @@ namespace BTLXLA
             {
                 rectCrop.Visibility = Visibility.Collapsed;
 
+                //string fileName = "#BTLXLA_DEFAULT.jpeg";
+                //file = await KnownFolders.CameraRoll.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                //await rectCrop.LoadImage(file);
+
                 if (captureManager != null)
                 {
                     await captureManager.StopPreviewAsync();
