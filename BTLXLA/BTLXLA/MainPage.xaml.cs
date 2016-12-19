@@ -74,7 +74,7 @@ namespace BTLXLA
         {
             if (DisplayInformation.AutoRotationPreferences != DisplayOrientations.Portrait)
                 DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
-            this.InitCam(Windows.Devices.Enumeration.Panel.Back);
+            //this.InitCam(Windows.Devices.Enumeration.Panel.Back);
         }
 
 
@@ -253,10 +253,6 @@ namespace BTLXLA
                 //SHARPENNING
                 matrixImage = ImageClass.ConvolutionFilter(matrixImage, ImageClass.maskSharp1, 1.0);
 
-                //THRESHOLDING
-                int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
-                matrixImage = ImageClass.OtsuProcessed(matrixImage, otsuT);
-
                 //GAUSSIAN SMOOTHING
                 Debug.WriteLine("stepS " + stepS);
                 Debug.WriteLine("stepN " + stepN);
@@ -270,6 +266,10 @@ namespace BTLXLA
 
                 //HE - I am not sure that method can improve the quality of image
                 matrixImage = ImageClass.HistogranEqualization(matrixImage);
+
+                //THRESHOLDING
+                int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
+                matrixImage = ImageClass.OtsuProcessed(matrixImage, otsuT);
 
                 //END OF THESE PROCEDURES
 
