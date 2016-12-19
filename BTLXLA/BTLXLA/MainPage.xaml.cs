@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BTLXLA.Controls;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -40,6 +41,7 @@ namespace BTLXLA
     {
         MediaCapture captureManager;
         private CoreApplicationView view;
+
         /// <summary>
         /// 0=front 1=back
         /// </summary>
@@ -51,17 +53,15 @@ namespace BTLXLA
 
         public MainPage()
         {
-
             this.InitializeComponent();
 
-            CompositionTarget.Rendering += CompositionTarget_Rendering;
             this.Loaded += MainPage_Loaded;
 
             view = CoreApplication.GetCurrentView();
             this.gestureRecognizer.GestureSettings = Windows.UI.Input.GestureSettings.Tap | Windows.UI.Input.GestureSettings.DoubleTap | Windows.UI.Input.GestureSettings.RightTap | Windows.UI.Input.GestureSettings.Drag;
 
             ocrEngine = new OcrEngine(OcrLanguage.English);
-            this.NavigationCacheMode = NavigationCacheMode.Required;
+            this.NavigationCacheMode = NavigationCacheMode.Enabled;
 
         }
 
@@ -76,15 +76,9 @@ namespace BTLXLA
         /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (captureManager == null)
-            {
+            if (DisplayInformation.AutoRotationPreferences != DisplayOrientations.Portrait)
                 DisplayInformation.AutoRotationPreferences = DisplayOrientations.Portrait;
-                this.InitCam(Windows.Devices.Enumeration.Panel.Back);
-            }
-            //double top = (LayoutRoot.ActualHeight - rect.ActualHeight) / 2.0;
-            //Canvas.SetTop(rect, top);
-            //double left = (LayoutRoot.ActualWidth - rect.ActualWidth) / 2.0;
-            //Canvas.SetLeft(rect, left);
+            this.InitCam(Windows.Devices.Enumeration.Panel.Back);
         }
 
 
@@ -92,16 +86,23 @@ namespace BTLXLA
         {
             try
             {
+                //rectCrop.Visibility = Visibility.Collapsed;
+
+                StorageFile file = await Converter.WriteableBitmapToStorageFile(new WriteableBitmap(384, 384), Converter.FileFormat.Jpeg);
+                await rectCrop.LoadImage(file);
+
                 if (captureManager != null)
                 {
                     await captureManager.StopPreviewAsync();
                     this.capture.Source = null;
                 }
+
                 captureManager = new MediaCapture();
                 var cameraDevice = await FindCameraDeviceByPanelAsync(panel);
                 var settings = new MediaCaptureInitializationSettings { VideoDeviceId = cameraDevice.Id };
                 await captureManager.InitializeAsync(settings);
                 capture.Source = captureManager;
+
                 string currentorientation = DisplayInformation.GetForCurrentView().CurrentOrientation.ToString();
                 switch (currentorientation)
                 {
@@ -128,7 +129,6 @@ namespace BTLXLA
                     if (flashMode == 1)
                     {
                         captureManager.VideoDeviceController.FlashControl.Enabled = false;
-                        //captureManager.MediaCaptureSettings.
                     }
                     else if (flashMode == 0)
                     {
@@ -138,10 +138,10 @@ namespace BTLXLA
 
                 await captureManager.StartPreviewAsync();
 
-                if (GetDisplayAspectRatio() == DisplayAspectRatio.FifteenByNine)
-                {
-                    GetFifteenByNineBounds();
-                }
+                //if (GetDisplayAspectRatio() == DisplayAspectRatio.FifteenByNine)
+                //{
+                //    GetFifteenByNineBounds();
+                //}
             }
             catch (Exception ex)
             {
@@ -161,8 +161,6 @@ namespace BTLXLA
             return desiredDevice ?? allVideoDevices.FirstOrDefault();
         }
 
-
-
         public static WriteableBitmap wb;
         StorageFile file;
         BitmapImage bmpImage;
@@ -170,28 +168,36 @@ namespace BTLXLA
 
         private async void btnCapture_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            Debug.WriteLine(1);
             await captureManager.VideoDeviceController.FocusControl.FocusAsync();
 
+            Debug.WriteLine(2);
             //Create JPEG image Encoding format for storing image in JPEG type  
             ImageEncodingProperties imgFormat = ImageEncodingProperties.CreateJpeg();
 
+            Debug.WriteLine(3);
             //rotate and save the image
             using (var imageStream = new InMemoryRandomAccessStream())
             {
 
+                Debug.WriteLine(4);
                 //generate stream from MediaCapture
                 await captureManager.CapturePhotoToStreamAsync(imgFormat, imageStream);
 
+                Debug.WriteLine(5);
                 //create decoder and encoder
                 BitmapDecoder dec = await BitmapDecoder.CreateAsync(imageStream);
                 BitmapEncoder enc = await BitmapEncoder.CreateForTranscodingAsync(imageStream, dec);
 
+                Debug.WriteLine(6);
                 //roate the image
                 enc.BitmapTransform.Rotation = BitmapRotation.Clockwise90Degrees;
 
+                Debug.WriteLine(7);
                 //write changes to the image stream
                 await enc.FlushAsync();
 
+                Debug.WriteLine(8);
                 // create storage file in local app storage  
                 TimeSpan span = DateTime.Now.TimeOfDay;
                 string time = String.Format("{0}{1}{2}", span.Hours, span.Minutes, span.Seconds);
@@ -200,19 +206,23 @@ namespace BTLXLA
                 //await captureManager.CapturePhotoToStorageFileAsync(imgFormat, file);
 
                 // Get photo as a BitmapImage
-                bmpImage = new BitmapImage(new Uri(file.Path));
+                //bmpImage = new BitmapImage(new Uri(file.Path));
 
+
+                Debug.WriteLine(9);
                 using (var fileStream = await file.OpenStreamForWriteAsync())
                 {
                     try
                     {
+                        Debug.WriteLine(10);
                         //because of using statement stream will be closed automatically after copying finished
                         await RandomAccessStream.CopyAsync(imageStream, fileStream.AsOutputStream());
 
-                        //wb = await StorageFileToWriteableBitmap(file);
-                        //arrImg = ImageClass.MakeGrayscale2Double(wb);
-                        // imagePreview is a <Image> object defined in XAML
-                        imgCapped.Source = bmpImage;
+                        Debug.WriteLine(11);
+                        rectCrop.Visibility = Visibility.Visible;
+                        Debug.WriteLine(13);
+                        await rectCrop.LoadImage(file);
+                        Debug.WriteLine(12);
                     }
                     catch
                     {
@@ -237,12 +247,10 @@ namespace BTLXLA
                 btnCapture.IsEnabled = false;
                 string extractedText = "";
 
-                //Debug.WriteLine(bmpImage.PixelWidth + " " + bmpImage.PixelHeight);
                 //From stream to WriteableBitmap
                 wb = await StorageFileToWriteableBitmap(file);
 
                 int fixedSize = (wb.PixelHeight < wb.PixelWidth) ? wb.PixelWidth : wb.PixelHeight;
-
 
                 //// Get the size of the image when it is displayed on the phone
                 double displayedWidth = imgCapped.ActualWidth;
@@ -252,27 +260,19 @@ namespace BTLXLA
 
                 double ratio = fixedSize / fixedDisplay;
 
-                double top = Canvas.GetTop(rect);
-                double left = Canvas.GetLeft(rect);
+                wb = rectCrop.CroppedImage;
 
-                //this action is used to re-calculate the top coordinate of rect
-                Debug.WriteLine(LayoutRoot.ActualHeight - wb.PixelHeight / ratio);
-                top = top + (LayoutRoot.ActualHeight - wb.PixelHeight / ratio);
-
-                //Debug.WriteLine((int)left + " " + (int)top + " " +
-                //    (int)(rect.ActualWidth * ratio) + " " + (int)(rect.ActualHeight * ratio));
-
-                wb = wb.Crop((int)(left * ratio), (int)(top * ratio),
-                    (int)(rect.ActualWidth * ratio), (int)(rect.ActualHeight * ratio));
-
+                //PREPROCESSING
                 byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
                 matrixImage = Converter.ByteArrayToMatrix(arrImg, wb.PixelWidth, 4);
+                matrixImage = ImageClass.ConvolutionFilter(matrixImage, ImageClass.maskSharp1, 1);
+
+                //THRESHOLDING
                 int otsuT = ImageClass.GetOtsuThreshold(matrixImage);
                 matrixImage = ImageClass.OtsuProcessed(matrixImage, otsuT);
                 arrImg = Converter.MatrixToByteArray(matrixImage);
-                //imgCapped.Source = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
-                wb = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
 
+                wb = ImageClass.ConvertByteArrayToBitmap(arrImg, wb.PixelWidth);
 
                 {
                     // Check whether is loaded image supported for processing.
@@ -288,7 +288,6 @@ namespace BTLXLA
                                             Environment.NewLine +
                                             "Supported image dimensions are between 40 and 2600 pixels.");
                         await dialog.ShowAsync();
-                        //ImageText.Style = (Style)Application.Current.Resources["RedTextStyle"];
 
                         return;
                     }
@@ -328,21 +327,11 @@ namespace BTLXLA
                             // Iterate over words in line.
                             foreach (var word in line.Words)
                             {
-                                var originalRect = new Rect(word.Left, word.Top, word.Width, word.Height);
-                                var overlayRect = scaleTrasform.TransformBounds(originalRect);
-
-                                var wordTextBlock = new TextBlock()
-                                {
-                                    Height = overlayRect.Height,
-                                    Width = overlayRect.Width,
-                                    FontSize = overlayRect.Height * 0.8,
-                                    Text = word.Text,
-
-                                };
-                                extractedText += word.Text + " ";
+                                Debug.WriteLine(word.Text);
+                                extractedText += word.Text;
                             }
+                            break;
                         }
-                        //txtString.Text = extractedText;
 
                     }
                     else
@@ -365,8 +354,6 @@ namespace BTLXLA
                 ocrEngine = new OcrEngine(OcrLanguage.English);
             }
         }
-
-
 
         private void grdLibrary_Tapped(object sender, TappedRoutedEventArgs e)
         {
@@ -393,10 +380,11 @@ namespace BTLXLA
 
                 view.Activated -= View_Activated;
                 file = args.Files[0];
+                await rectCrop.LoadImage(file);
 
                 ImageProperties properties = await file.Properties.GetImagePropertiesAsync();
-                wb = await Converter.StorageFileToWriteableBitmap(file);
-                imgCapped.Source = wb;
+                //wb = await Converter.StorageFileToWriteableBitmap(file);
+                //imgCapped.Source = wb;
             }
         }
 
@@ -449,7 +437,6 @@ namespace BTLXLA
             await bitmap.SetSourceAsync(inMemoryRandomStream2);
             return bitmap;
         }
-
 
         #region CAMERA HELPERS
         private int flashMode = 0;
@@ -649,57 +636,5 @@ namespace BTLXLA
         }
         #endregion
 
-        #region CROPPING
-        Point Point1, Point2, TempPoint1, TempPoint2;
-
-
-        private void img_PointerMoved(object sender, PointerRoutedEventArgs e)
-        {
-            SetPoint(out TempPoint2, imgCapped, e);
-            //Debug.WriteLine("img_PointerMoved " + TempPoint2.X + " " + TempPoint2.Y);
-        }
-
-        List<uint> pIds = new List<uint>();
-        private void img_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            Point1 = new Point(Canvas.GetLeft(rect), Canvas.GetTop(rect));
-            SetPoint(out TempPoint1, imgCapped, e);
-            TempPoint2 = TempPoint1;
-            //Debug.WriteLine("img_PointerPressed " + TempPoint1.X + " " + TempPoint1.Y);
-        }
-
-        private void img_PointerReleased(object sender, PointerRoutedEventArgs e)
-        {
-            Debug.WriteLine("img_PointerReleased " + pIds.Count);
-            pIds.Clear();
-        }
-
-        private void rect_ManipulationDelta(object sender, ManipulationDeltaRoutedEventArgs e)
-        {
-            //Debug.WriteLine(pIds.Count);
-        }
-
-        private void SetPoint(out Point point, UIElement uielement, PointerRoutedEventArgs e)
-        {
-            point = e.GetCurrentPoint(uielement).Position;
-            if (point.X < 0)
-                point.X = 0;
-            if (point.Y < 0)
-                point.Y = 0;
-        }
-
-
-        private void CompositionTarget_Rendering(object sender, object e)
-        {
-            double xoffset = TempPoint2.X - TempPoint1.X;
-            double yoffset = TempPoint2.Y - TempPoint1.Y;
-
-            Point tempPoint = new Point(Point1.X + xoffset, Point1.Y + yoffset);
-            //Debug.WriteLine(tempPoint.X + " " + tempPoint.Y);
-
-            Canvas.SetLeft(rect, tempPoint.X);
-            Canvas.SetTop(rect, tempPoint.Y);
-        }
-        #endregion
     }
 }

@@ -15,6 +15,7 @@ namespace BTLXLA
         public static int[,] maskPrewittDx = new int[3, 3] { { 1, 0, -1 }, { 1, 0, -1 }, { 1, 0, -1 } };
         public static int[,] maskPrewittDy = new int[3, 3] { { -1, -1, -1 }, { 0, 0, 0 }, { 1, 1, 1 } };
 
+        public static int[,] maskSharp1 = new int[3, 3] { { -1, -1, -1 }, { -1, 9, -1 }, { -1, -1, -1 } };
 
         public static WriteableBitmap ConvertDoubleArrToBitmap(double[,] arr)
         {
@@ -391,7 +392,7 @@ namespace BTLXLA
             {
                 for (int i = 0; i < imageSource.GetLength(0); i++)
                 {
-                    imageSource[i, j] = imageSource[i, j] > (int)threshold ? 0 : 255;
+                    imageSource[i, j] = imageSource[i, j] > (int)threshold ? 255 : 0;
                 }
             }
             return imageSource;
@@ -489,8 +490,6 @@ namespace BTLXLA
         }
         public static void NegativeT2(WriteableBitmap bmpInput)
         {
-
-
             //// Lock the bitmap's bits.  
             //Rectangle rtg = new Rectangle(0, 0, bmpInput.PixelWidth, bmpInput.PixelHeight);
             //BitmapData bmpData = bmpInput.LockBits(rtg, ImageLockMode.ReadWrite, bmpInput.PixelFormat);

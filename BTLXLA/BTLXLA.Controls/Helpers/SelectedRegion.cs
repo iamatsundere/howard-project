@@ -20,6 +20,7 @@ namespace BTLXLA.Controls.Helpers
 {
     using System;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Linq;
     using Windows.Foundation;
 
@@ -169,6 +170,18 @@ namespace BTLXLA.Controls.Helpers
                 propertyName == BottomRightCornerCanvasLeftPropertyName ||
                 propertyName == BottomRightCornerCanvasTopPropertyName)
             {
+                //Debug.WriteLine("topLeftCornerCanvasLeft " + TopLeftCornerCanvasLeft);
+                //Debug.WriteLine("topLeftCornerCanvasTop " + TopLeftCornerCanvasTop);
+                //Debug.WriteLine("bottomRightCornerCanvasLeft " + BottomRightCornerCanvasLeft);
+                //Debug.WriteLine("bottomRightCornerCanvasTop " + BottomRightCornerCanvasTop);
+
+                if (BottomRightCornerCanvasLeft == 0 || BottomRightCornerCanvasTop == 0)
+                {
+                    TopLeftCornerCanvasTop = 311;
+                    BottomRightCornerCanvasLeft = TopLeftCornerCanvasLeft + 300;
+                    BottomRightCornerCanvasTop = TopLeftCornerCanvasTop + 128;
+                }
+
                 SelectedRect = new Rect(
                     TopLeftCornerCanvasLeft,
                     TopLeftCornerCanvasTop,
@@ -181,6 +194,11 @@ namespace BTLXLA.Controls.Helpers
         public void ResetCorner(double topLeftCornerCanvasLeft, double topLeftCornerCanvasTop,
             double bottomRightCornerCanvasLeft, double bottomRightCornerCanvasTop)
         {
+            //Debug.WriteLine("topLeftCornerCanvasLeft " + topLeftCornerCanvasLeft);
+            //Debug.WriteLine("topLeftCornerCanvasTop " + topLeftCornerCanvasTop);
+            //Debug.WriteLine("bottomRightCornerCanvasLeft " + bottomRightCornerCanvasLeft);
+            //Debug.WriteLine("bottomRightCornerCanvasTop " + bottomRightCornerCanvasTop);
+
             this.TopLeftCornerCanvasLeft = topLeftCornerCanvasLeft;
             this.TopLeftCornerCanvasTop = topLeftCornerCanvasTop;
             this.BottomRightCornerCanvasLeft = bottomRightCornerCanvasLeft;
