@@ -48,10 +48,6 @@ namespace BTLXLA
         private int cappedValue = 0;
 
 
-        /// <summary>
-        /// 0=front 1=back
-        /// </summary>
-        //private int CamId = 1;
         private OcrEngine ocrEngine;
 
         GestureRecognizer gestureRecognizer = new GestureRecognizer();
@@ -254,6 +250,9 @@ namespace BTLXLA
 
         private async void grdScan_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            if (cappedValue != 1 && file == null)
+                return;
+
             grdLoading.Visibility = Visibility.Visible;
 
             try
@@ -374,6 +373,9 @@ namespace BTLXLA
                 btnCapture.IsEnabled = true;
                 ocrEngine = new OcrEngine(OcrLanguage.English);
                 grdLoading.Visibility = Visibility.Collapsed;
+
+                //cappedValue = 2;
+                file = null;
             }
         }
 
