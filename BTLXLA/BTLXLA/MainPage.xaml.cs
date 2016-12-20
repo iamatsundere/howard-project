@@ -141,7 +141,7 @@ namespace BTLXLA
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+               //Debug.WriteLine(ex.Message);
             }
         }
 
@@ -165,36 +165,36 @@ namespace BTLXLA
         #region APP MAIN FUNCTIONS
         private async void btnCapture_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            Debug.WriteLine(1);
+           //Debug.WriteLine(1);
             await captureManager.VideoDeviceController.FocusControl.FocusAsync();
 
-            Debug.WriteLine(2);
+           //Debug.WriteLine(2);
             //Create JPEG image Encoding format for storing image in JPEG type  
             ImageEncodingProperties imgFormat = ImageEncodingProperties.CreateJpeg();
 
-            Debug.WriteLine(3);
+           //Debug.WriteLine(3);
             //rotate and save the image
             using (var imageStream = new InMemoryRandomAccessStream())
             {
 
-                Debug.WriteLine(4);
+               //Debug.WriteLine(4);
                 //generate stream from MediaCapture
                 await captureManager.CapturePhotoToStreamAsync(imgFormat, imageStream);
 
-                Debug.WriteLine(5);
+               //Debug.WriteLine(5);
                 //create decoder and encoder
                 BitmapDecoder dec = await BitmapDecoder.CreateAsync(imageStream);
                 BitmapEncoder enc = await BitmapEncoder.CreateForTranscodingAsync(imageStream, dec);
 
-                Debug.WriteLine(6);
+               //Debug.WriteLine(6);
                 //roate the image
                 enc.BitmapTransform.Rotation = BitmapRotation.Clockwise90Degrees;
 
-                Debug.WriteLine(7);
+               //Debug.WriteLine(7);
                 //write changes to the image stream
                 await enc.FlushAsync();
 
-                Debug.WriteLine(8);
+               //Debug.WriteLine(8);
                 // create storage file in local app storage  
                 TimeSpan span = DateTime.Now.TimeOfDay;
                 string time = String.Format("{0}{1}{2}", span.Hours, span.Minutes, span.Seconds);
@@ -206,20 +206,20 @@ namespace BTLXLA
                 //bmpImage = new BitmapImage(new Uri(file.Path));
 
 
-                Debug.WriteLine(9);
+               //Debug.WriteLine(9);
                 using (var fileStream = await file.OpenStreamForWriteAsync())
                 {
                     try
                     {
-                        Debug.WriteLine(10);
+                       //Debug.WriteLine(10);
                         //because of using statement stream will be closed automatically after copying finished
                         await RandomAccessStream.CopyAsync(imageStream, fileStream.AsOutputStream());
 
-                        Debug.WriteLine(11);
+                       //Debug.WriteLine(11);
                         rectCrop.Visibility = Visibility.Visible;
-                        Debug.WriteLine(13);
+                       //Debug.WriteLine(13);
                         await rectCrop.LoadImage(file);
-                        Debug.WriteLine(12);
+                       //Debug.WriteLine(12);
                     }
                     catch
                     {
@@ -237,8 +237,11 @@ namespace BTLXLA
 
         private async void grdScan_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            grdLoading.Visibility = Visibility.Visible;
+
             try
             {
+
                 // Prevent another OCR request, since only image can be processed at the time at same OCR engine instance.
                 grdScan.IsTapEnabled = false;
                 btnCapture.IsEnabled = false;
@@ -254,8 +257,8 @@ namespace BTLXLA
                 matrixImage = ImageClass.ConvolutionFilter(matrixImage, ImageClass.maskSharp1, 1.0);
 
                 //GAUSSIAN SMOOTHING
-                Debug.WriteLine("stepS " + stepS);
-                Debug.WriteLine("stepN " + stepN);
+               //Debug.WriteLine("stepS " + stepS);
+               //Debug.WriteLine("stepN " + stepN);
                 matrixImage = ImageClass.GaussSmoothing(matrixImage, stepN * 2 + 1, stepS * 0.5);
 
                 ////This is stupid, too
@@ -291,7 +294,7 @@ namespace BTLXLA
                         return;
                     }
 
-                    Debug.WriteLine(-1);
+                   //Debug.WriteLine(-1);
                     // This main API call to extract text from image.
                     var ocrResult = await ocrEngine.RecognizeAsync((uint)wb.PixelHeight, (uint)wb.PixelWidth, wb.PixelBuffer.ToArray());
 
@@ -319,14 +322,14 @@ namespace BTLXLA
                             };
                         }
 
-                        Debug.WriteLine(2);
+                       //Debug.WriteLine(2);
                         // Iterate over recognized lines of text.
                         foreach (var line in ocrResult.Lines)
                         {
                             // Iterate over words in line.
                             foreach (var word in line.Words)
                             {
-                                Debug.WriteLine(word.Text);
+                               //Debug.WriteLine(word.Text);
                                 extractedText += word.Text;
                             }
                             break;
@@ -351,6 +354,7 @@ namespace BTLXLA
                 grdScan.IsTapEnabled = true;
                 btnCapture.IsEnabled = true;
                 ocrEngine = new OcrEngine(OcrLanguage.English);
+                grdLoading.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -383,8 +387,8 @@ namespace BTLXLA
                 file = args.Files[0];
                 rectCrop.Visibility = Visibility.Visible;
                 await rectCrop.LoadImage(file);
-
-                ImageProperties properties = await file.Properties.GetImagePropertiesAsync();
+                
+                //ImageProperties properties = await file.Properties.GetImagePropertiesAsync();
                 //wb = await Converter.StorageFileToWriteableBitmap(file);
                 //imgCapped.Source = wb;
             }
@@ -408,7 +412,7 @@ namespace BTLXLA
 
             // then to turn on/off camera
             var torch = captureManager.VideoDeviceController.TorchControl;
-            Debug.WriteLine(torch.PowerPercent);
+           //Debug.WriteLine(torch.PowerPercent);
             if (torch.Supported)
             {
                 if (flashMode == 1)

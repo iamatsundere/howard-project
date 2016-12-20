@@ -46,6 +46,8 @@ namespace BTLXLA
                     {
                         proString += passed[i];
                     }
+                if (proString.Equals(""))
+                    proString = "ERROR";
                 txtString.Text = proString;
                 preString = passed;
             }

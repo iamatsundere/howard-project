@@ -8,6 +8,7 @@
       xmlns:capture="using:Windows.Media.Capture"
       xmlns:c4f="using:Coding4Fun.Toolkit.Controls"
       xmlns:cc="using:BTLXLA.Controls"
+      xmlns:telerik="using:Telerik.UI.Xaml.Controls.Primitives"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       RequestedTheme="Dark">
 
@@ -32,7 +33,9 @@
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center">
 
-                --><!--Rectangle to be used for Crop Original Image--><!--
+                -->
+        <!--Rectangle to be used for Crop Original Image-->
+        <!--
                 <Rectangle x:Name="rect"
                            Height="100"
                            Width="384"
@@ -47,7 +50,7 @@
             </Canvas>
         </Grid>-->
 
-        <cc:ImageCropper x:Name="rectCrop"/>
+        <cc:ImageCropper x:Name="rectCrop" />
 
         <Grid Height="128"
               VerticalAlignment="Bottom">
@@ -126,6 +129,28 @@
                         Background="{StaticResource PhoneAccentBrush}">
                 </Button>-->
             </Grid>
+        </Grid>
+
+        <Grid Name="grdLoading"
+              Visibility="Collapsed"
+              Background="Transparent">
+            <!--<StackPanel VerticalAlignment="Center">
+               
+                <ProgressBar x:Name="myIndeterminateProbar"
+                             IsIndeterminate="True"
+                             Height="48" />
+             <TextBlock Text="processing..."
+                           HorizontalAlignment="Center"
+                           FontSize="25" />
+            </StackPanel>-->
+            <telerik:RadBusyIndicator Name="radBusy"
+                                      IsActive="True"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Center"
+                                      Content="processing"
+                                      AnimationStyle="AnimationStyle1"
+                                      Foreground="White">
+            </telerik:RadBusyIndicator>
         </Grid>
     </Grid>
 </Page>
