@@ -48,14 +48,7 @@
     <Capability Name="removableStorage" />
     <Capability Name="picturesLibrary" />
     <Capability Name="videosLibrary" />
-    <Capability Name="enterpriseAuthentication" />
-    <Capability Name="sharedUserCertificates" />
-    <Capability Name="musicLibrary" />
-    <m3:Capability Name="contacts" />
     <m3:Capability Name="appointments" />
     <DeviceCapability Name="webcam" />
-    <DeviceCapability Name="proximity" />
-    <DeviceCapability Name="microphone" />
-    <DeviceCapability Name="location" />
   </Capabilities>
 </Package>

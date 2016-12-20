@@ -44,6 +44,9 @@ namespace BTLXLA
         private int stepN = 2;
         private int stepS = 1;
 
+        //0 init 1 capped 2 notcapped
+        private int cappedValue = 0;
+
 
         /// <summary>
         /// 0=front 1=back
@@ -56,13 +59,17 @@ namespace BTLXLA
         public MainPage()
         {
             this.InitializeComponent();
+            this.Loaded += MainPage_Loaded;
+            //this.gestureRecognizer.GestureSettings = Windows.UI.Input.GestureSettings.Tap | Windows.UI.Input.GestureSettings.DoubleTap | Windows.UI.Input.GestureSettings.RightTap | Windows.UI.Input.GestureSettings.Drag;
 
-            view = CoreApplication.GetCurrentView();
-            this.gestureRecognizer.GestureSettings = Windows.UI.Input.GestureSettings.Tap | Windows.UI.Input.GestureSettings.DoubleTap | Windows.UI.Input.GestureSettings.RightTap | Windows.UI.Input.GestureSettings.Drag;
-
-            ocrEngine = new OcrEngine(OcrLanguage.English);
             this.NavigationCacheMode = NavigationCacheMode.Required;
 
+        }
+
+        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            view = CoreApplication.GetCurrentView();
+            ocrEngine = new OcrEngine(OcrLanguage.English);
         }
 
         /// <summary>
@@ -80,75 +87,79 @@ namespace BTLXLA
 
         private async void InitCam(Windows.Devices.Enumeration.Panel panel)
         {
-            try
+            rectCrop.Visibility = Visibility.Collapsed;
+            if (cappedValue == 0 || cappedValue == 1)
             {
-                rectCrop.Visibility = Visibility.Collapsed;
-
-                //StorageFile file = await Converter.WriteableBitmapToStorageFile(new WriteableBitmap(384, 384), Converter.FileFormat.Jpeg);
-                //await rectCrop.LoadImage(file);
-
-                Debug.WriteLine(1000);
-                if (captureManager != null)
+                cappedValue = 2;
+                try
                 {
-                    Debug.WriteLine(1001);
-                    await captureManager.StopPreviewAsync();
-                    this.capture.Source = null;
-                }
-
-                Debug.WriteLine(1002);
-                captureManager = new MediaCapture();
-                var cameraDevice = await FindCameraDeviceByPanelAsync(panel);
-                var settings = new MediaCaptureInitializationSettings { VideoDeviceId = cameraDevice.Id };
-                await captureManager.InitializeAsync(settings);
-                capture.Source = captureManager;
-
-                Debug.WriteLine(1003);
-                string currentorientation = DisplayInformation.GetForCurrentView().CurrentOrientation.ToString();
-                switch (currentorientation)
-                {
-                    case "Landscape":
-                        captureManager.SetPreviewRotation(VideoRotation.None);
-                        break;
-                    case "Portrait":
-                        captureManager.SetPreviewRotation(VideoRotation.Clockwise90Degrees);
-                        break;
-                    case "LandscapeFlipped":
-                        captureManager.SetPreviewRotation(VideoRotation.Clockwise180Degrees);
-                        break;
-                    case "PortraitFlipped":
-                        captureManager.SetPreviewRotation(VideoRotation.Clockwise270Degrees);
-                        break;
-                    default:
-                        captureManager.SetPreviewRotation(VideoRotation.None);
-                        break;
-                }
-
-                Debug.WriteLine(1004);
-                var torch = captureManager.VideoDeviceController.TorchControl;
-                if (torch.Supported)
-                {
-                    if (flashMode == 1)
+                    Debug.WriteLine(1000);
+                    if (captureManager != null)
                     {
-                        captureManager.VideoDeviceController.FlashControl.Enabled = false;
+                        Debug.WriteLine(1001);
+                        await captureManager.StopPreviewAsync();
+                        this.capture.Source = null;
                     }
-                    else if (flashMode == 0)
+
+                    Debug.WriteLine(1002);
+                    captureManager = new MediaCapture();
+                    var cameraDevice = await FindCameraDeviceByPanelAsync(panel);
+                    var settings = new MediaCaptureInitializationSettings { VideoDeviceId = cameraDevice.Id };
+                    await captureManager.InitializeAsync(settings);
+                    capture.Source = captureManager;
+
+                    Debug.WriteLine(1003);
+                    string currentorientation = DisplayInformation.GetForCurrentView().CurrentOrientation.ToString();
+                    switch (currentorientation)
                     {
-                        captureManager.VideoDeviceController.FlashControl.Enabled = true;
+                        case "Landscape":
+                            captureManager.SetPreviewRotation(VideoRotation.None);
+                            break;
+                        case "Portrait":
+                            captureManager.SetPreviewRotation(VideoRotation.Clockwise90Degrees);
+                            break;
+                        case "LandscapeFlipped":
+                            captureManager.SetPreviewRotation(VideoRotation.Clockwise180Degrees);
+                            break;
+                        case "PortraitFlipped":
+                            captureManager.SetPreviewRotation(VideoRotation.Clockwise270Degrees);
+                            break;
+                        default:
+                            captureManager.SetPreviewRotation(VideoRotation.None);
+                            break;
                     }
+
+                    Debug.WriteLine(1004);
+                    var torch = captureManager.VideoDeviceController.TorchControl;
+                    if (torch.Supported)
+                    {
+                        if (flashMode == 1)
+                        {
+                            captureManager.VideoDeviceController.FlashControl.Enabled = false;
+                        }
+                        else if (flashMode == 0)
+                        {
+                            captureManager.VideoDeviceController.FlashControl.Enabled = true;
+                        }
+                    }
+
+                    Debug.WriteLine(1005);
+                    await captureManager.StartPreviewAsync();
+
+                    //IMPROVING CAM RESOLUTION
+                    //if (GetDisplayAspectRatio() == DisplayAspectRatio.FifteenByNine)
+                    //{
+                    //    GetFifteenByNineBounds();
+                    //}
                 }
-
-                Debug.WriteLine(1005);
-                await captureManager.StartPreviewAsync();
-
-                //IMPROVING CAM RESOLUTION
-                //if (GetDisplayAspectRatio() == DisplayAspectRatio.FifteenByNine)
-                //{
-                //    GetFifteenByNineBounds();
-                //}
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Debug.WriteLine(ex.Message);
+                return;
             }
         }
 
@@ -171,36 +182,36 @@ namespace BTLXLA
         #region APP MAIN FUNCTIONS
         private async void btnCapture_Tapped(object sender, TappedRoutedEventArgs e)
         {
-           //Debug.WriteLine(1);
+            //Debug.WriteLine(1);
             await captureManager.VideoDeviceController.FocusControl.FocusAsync();
 
-           //Debug.WriteLine(2);
+            //Debug.WriteLine(2);
             //Create JPEG image Encoding format for storing image in JPEG type  
             ImageEncodingProperties imgFormat = ImageEncodingProperties.CreateJpeg();
 
-           //Debug.WriteLine(3);
+            //Debug.WriteLine(3);
             //rotate and save the image
             using (var imageStream = new InMemoryRandomAccessStream())
             {
 
-               //Debug.WriteLine(4);
+                //Debug.WriteLine(4);
                 //generate stream from MediaCapture
                 await captureManager.CapturePhotoToStreamAsync(imgFormat, imageStream);
 
-               //Debug.WriteLine(5);
+                //Debug.WriteLine(5);
                 //create decoder and encoder
                 BitmapDecoder dec = await BitmapDecoder.CreateAsync(imageStream);
                 BitmapEncoder enc = await BitmapEncoder.CreateForTranscodingAsync(imageStream, dec);
 
-               //Debug.WriteLine(6);
+                //Debug.WriteLine(6);
                 //roate the image
                 enc.BitmapTransform.Rotation = BitmapRotation.Clockwise90Degrees;
 
-               //Debug.WriteLine(7);
+                //Debug.WriteLine(7);
                 //write changes to the image stream
                 await enc.FlushAsync();
 
-               //Debug.WriteLine(8);
+                //Debug.WriteLine(8);
                 // create storage file in local app storage  
                 TimeSpan span = DateTime.Now.TimeOfDay;
                 string time = String.Format("{0}{1}{2}", span.Hours, span.Minutes, span.Seconds);
@@ -212,20 +223,20 @@ namespace BTLXLA
                 //bmpImage = new BitmapImage(new Uri(file.Path));
 
 
-               //Debug.WriteLine(9);
+                //Debug.WriteLine(9);
                 using (var fileStream = await file.OpenStreamForWriteAsync())
                 {
                     try
                     {
-                       //Debug.WriteLine(10);
+                        //Debug.WriteLine(10);
                         //because of using statement stream will be closed automatically after copying finished
                         await RandomAccessStream.CopyAsync(imageStream, fileStream.AsOutputStream());
 
-                       //Debug.WriteLine(11);
+                        //Debug.WriteLine(11);
                         rectCrop.Visibility = Visibility.Visible;
-                       //Debug.WriteLine(13);
+                        cappedValue = 1;
                         await rectCrop.LoadImage(file);
-                       //Debug.WriteLine(12);
+                        //Debug.WriteLine(12);
                     }
                     catch
                     {
@@ -259,7 +270,7 @@ namespace BTLXLA
 
                 byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
                 matrixImage = Converter.ByteArrayToMatrix(arrImg, wb.PixelWidth, 4);
-                
+
                 //SMOOTHING
                 matrixImage = ImageClass.GaussSmoothing(matrixImage, stepN * 2 + 1, stepS * 0.5);
 
@@ -302,7 +313,7 @@ namespace BTLXLA
                         return;
                     }
 
-                   //Debug.WriteLine(-1);
+                    //Debug.WriteLine(-1);
                     // This main API call to extract text from image.
                     var ocrResult = await ocrEngine.RecognizeAsync((uint)wb.PixelHeight, (uint)wb.PixelWidth, wb.PixelBuffer.ToArray());
 
@@ -330,14 +341,14 @@ namespace BTLXLA
                             };
                         }
 
-                       //Debug.WriteLine(2);
+                        //Debug.WriteLine(2);
                         // Iterate over recognized lines of text.
                         foreach (var line in ocrResult.Lines)
                         {
                             // Iterate over words in line.
                             foreach (var word in line.Words)
                             {
-                               //Debug.WriteLine(word.Text);
+                                //Debug.WriteLine(word.Text);
                                 extractedText += word.Text;
                             }
                             break;
@@ -390,11 +401,11 @@ namespace BTLXLA
             if (args != null)
             {
                 if (args.Files.Count == 0) return;
-
-                view.Activated -= View_Activated;
+                cappedValue = 0;
                 file = args.Files[0];
                 rectCrop.Visibility = Visibility.Visible;
                 await rectCrop.LoadImage(file);
+                view.Activated -= View_Activated;
             }
         }
 
@@ -416,7 +427,7 @@ namespace BTLXLA
 
             // then to turn on/off camera
             var torch = captureManager.VideoDeviceController.TorchControl;
-           //Debug.WriteLine(torch.PowerPercent);
+            //Debug.WriteLine(torch.PowerPercent);
             if (torch.Supported)
             {
                 if (flashMode == 1)

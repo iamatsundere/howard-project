@@ -31,7 +31,7 @@
                                Stretch="Uniform" />
                         <Canvas x:Name="PART_ImageCanvas"
                                 Visibility="Collapsed">
-                            <Path Fill="{StaticResource ApplicationSecondaryForegroundThemeBrush}"
+                            <Path Fill="Gray"
                                   Opacity="0.9">
                                 <Path.Data>
                                     <GeometryGroup>
