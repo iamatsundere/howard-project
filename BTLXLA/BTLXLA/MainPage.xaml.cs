@@ -41,7 +41,7 @@ namespace BTLXLA
     {
         MediaCapture captureManager;
         private CoreApplicationView view;
-        private int stepN = 1;
+        private int stepN = 2;
         private int stepS = 1;
 
 
