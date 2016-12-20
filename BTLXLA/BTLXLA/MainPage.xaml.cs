@@ -92,7 +92,6 @@ namespace BTLXLA
                 {
                     Debug.WriteLine(1001);
                     await captureManager.StopPreviewAsync();
-                    await captureManager.StopRecordAsync();
                     this.capture.Source = null;
                 }
 
