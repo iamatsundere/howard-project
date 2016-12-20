@@ -48,7 +48,7 @@ namespace BTLXLA
         /// <summary>
         /// 0=front 1=back
         /// </summary>
-        private int CamId = 1;
+        //private int CamId = 1;
         private OcrEngine ocrEngine;
 
         GestureRecognizer gestureRecognizer = new GestureRecognizer();
@@ -87,18 +87,23 @@ namespace BTLXLA
                 //StorageFile file = await Converter.WriteableBitmapToStorageFile(new WriteableBitmap(384, 384), Converter.FileFormat.Jpeg);
                 //await rectCrop.LoadImage(file);
 
+                Debug.WriteLine(1000);
                 if (captureManager != null)
                 {
+                    Debug.WriteLine(1001);
                     await captureManager.StopPreviewAsync();
+                    await captureManager.StopRecordAsync();
                     this.capture.Source = null;
                 }
 
+                Debug.WriteLine(1002);
                 captureManager = new MediaCapture();
                 var cameraDevice = await FindCameraDeviceByPanelAsync(panel);
                 var settings = new MediaCaptureInitializationSettings { VideoDeviceId = cameraDevice.Id };
                 await captureManager.InitializeAsync(settings);
                 capture.Source = captureManager;
 
+                Debug.WriteLine(1003);
                 string currentorientation = DisplayInformation.GetForCurrentView().CurrentOrientation.ToString();
                 switch (currentorientation)
                 {
@@ -119,6 +124,7 @@ namespace BTLXLA
                         break;
                 }
 
+                Debug.WriteLine(1004);
                 var torch = captureManager.VideoDeviceController.TorchControl;
                 if (torch.Supported)
                 {
@@ -132,8 +138,10 @@ namespace BTLXLA
                     }
                 }
 
+                Debug.WriteLine(1005);
                 await captureManager.StartPreviewAsync();
 
+                //IMPROVING CAM RESOLUTION
                 //if (GetDisplayAspectRatio() == DisplayAspectRatio.FifteenByNine)
                 //{
                 //    GetFifteenByNineBounds();
@@ -141,7 +149,7 @@ namespace BTLXLA
             }
             catch (Exception ex)
             {
-               //Debug.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
         }
 
@@ -159,7 +167,6 @@ namespace BTLXLA
 
         public static WriteableBitmap wb;
         StorageFile file;
-        BitmapImage bmpImage;
         double[,] matrixImage;
 
         #region APP MAIN FUNCTIONS
@@ -253,13 +260,15 @@ namespace BTLXLA
 
                 byte[] arrImg = ImageClass.ConvertBitmapToByteGray(wb);
                 matrixImage = Converter.ByteArrayToMatrix(arrImg, wb.PixelWidth, 4);
-                //SHARPENNING
-                matrixImage = ImageClass.ConvolutionFilter(matrixImage, ImageClass.maskSharp1, 1.0);
+                
+                //SMOOTHING
+                matrixImage = ImageClass.GaussSmoothing(matrixImage, stepN * 2 + 1, stepS * 0.5);
 
                 //GAUSSIAN SMOOTHING
-               //Debug.WriteLine("stepS " + stepS);
-               //Debug.WriteLine("stepN " + stepN);
-                matrixImage = ImageClass.GaussSmoothing(matrixImage, stepN * 2 + 1, stepS * 0.5);
+                //Debug.WriteLine("stepS " + stepS);
+                //Debug.WriteLine("stepN " + stepN);
+                //SHARPENNING
+                matrixImage = ImageClass.ConvolutionFilter(matrixImage, ImageClass.maskSharp1, 1.0);
 
                 ////This is stupid, too
                 //matrixImage = ImageClass.NoiseFilter(matrixImage, "MAX");
@@ -387,10 +396,6 @@ namespace BTLXLA
                 file = args.Files[0];
                 rectCrop.Visibility = Visibility.Visible;
                 await rectCrop.LoadImage(file);
-                
-                //ImageProperties properties = await file.Properties.GetImagePropertiesAsync();
-                //wb = await Converter.StorageFileToWriteableBitmap(file);
-                //imgCapped.Source = wb;
             }
         }
 

@@ -32,7 +32,7 @@
                         <Canvas x:Name="PART_ImageCanvas"
                                 Visibility="Collapsed">
                             <Path Fill="{StaticResource ApplicationSecondaryForegroundThemeBrush}"
-                                  Opacity="0.6">
+                                  Opacity="0.9">
                                 <Path.Data>
                                     <GeometryGroup>
                                         <RectangleGeometry Rect="{Binding OuterRect,Mode=OneWay}">

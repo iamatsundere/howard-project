@@ -441,7 +441,7 @@ namespace BTLXLA
         {
             for (int j = 0; j < imageSource.GetLength(0); j += 4)
             {
-                imageSource[j] = imageSource[j] > (byte)threshold ? (byte)0 : (byte)255;
+                imageSource[j] = imageSource[j] > (byte)threshold ? (byte)255 : (byte)0;
             }
             return imageSource;
         }
@@ -1424,6 +1424,103 @@ namespace BTLXLA
 
             arrImage = ConvolutionFilter(arrImage, matrixG, 1.0);
             return arrImage;
+        }
+        #endregion
+
+        #region BASIC OTSU METHOD
+
+        private static double[] pArray = new double[256];
+        private static double[] omgArray = new double[256];
+
+        private static double Pi(double[,] arrImage, int iValue)
+        {
+            int w = arrImage.GetLength(1);
+            int h = arrImage.GetLength(0);
+            int sum = 0;
+
+            for (int i = 0; i < h; i++)
+                for (int j = 0; j < w; j++)
+                {
+                    if (arrImage[i, j] == iValue)
+                    {
+                        sum += 1;
+                    }
+                }
+            return (double)(sum) / (w * h);
+        }
+
+        private static double OMi(int startGray, int endGray, double[] arrPx)
+        {
+            double sum = 0.0;
+            if (startGray > endGray)
+            {
+                int x = startGray;
+                startGray = endGray;
+                endGray = x;
+            }
+            if (startGray < 0)
+                startGray = 0;
+            if (endGray > 255)
+                endGray = 255;
+
+            for (int i = startGray; i <= endGray; i++)
+                sum += arrPx[i];
+            return sum;
+        }
+
+        private static double Mui(int startGray, int endGray, double[] arrPx)
+        {
+            double sum = 0.0;
+            if (startGray > endGray)
+            {
+                int x = startGray;
+                startGray = endGray;
+                endGray = x;
+            }
+            if (startGray < 0)
+                startGray = 0;
+            if (endGray > 255)
+                endGray = 255;
+
+            for (int i = startGray; i <= endGray; i++)
+                sum += i * arrPx[i];
+            return sum / OMi(startGray, endGray, arrPx);
+        }
+
+        public static int SIGMAi(double[,] arrImage)
+        {
+            int w = arrImage.GetLength(1);
+            int h = arrImage.GetLength(0);
+
+            for (int i = 0; i <= 255; i++)
+            {
+                pArray[i] = Pi(arrImage, i);
+            }
+
+            double max = 0.0;
+            int maxIndex = 0;
+
+            for (int level = 0; level < 255; level++)
+            {
+                double OM1 = OMi(0, level, pArray);
+                double OM2 = OMi(level + 1, 255, pArray);
+                //Console.WriteLine("OM1 " + OM1 + " OM2 " + OM2);
+
+                double Mu1 = Mui(0, level, pArray);
+                double Mu2 = Mui(level + 1, 255, pArray);
+                double Mut = Mui(0, 255, pArray);
+
+                //double OMx = OM1 * Math.Pow((Mu1 - Mut), 2) + OM2 * Math.Pow((Mu2 - Mut), 2);
+                double OMx = OM1 * OM2 * Math.Pow((Mu2 - Mu1), 2);
+                omgArray[level] = OMx;
+                if (OMx > max)
+                {
+                    max = OMx;
+                    maxIndex = level;
+                }
+            }
+
+            return maxIndex;
         }
         #endregion
     }
